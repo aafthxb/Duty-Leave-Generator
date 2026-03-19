@@ -171,22 +171,22 @@
 
 <div class="card">
     <div id="homeView">
-        <h2>What do you need to draft today?</h2>
+        <h2>Draft your Formal Letters with Simple Clicks!</h2>
         <div class="grid">
             <div class="option-card" onclick="delayedNavigate('standardView')">
-                <h3>🎟️ Event / Fest DL</h3>
-                <p style="font-size: 0.85rem; color: #666;">Standard formatting for tech fests, ideathons, and duty leave.</p>
+                <h3>🎟️ Standard DL</h3>
+                <p style="font-size: 0.85rem; color: #666;">Standard formatting for duty leave for tech fests, ideathons, etc.</p>
             </div>
             <div class="option-card" onclick="delayedNavigate('aiView')">
                 <h3>✨ Custom AI Letter</h3>
-                <p style="font-size: 0.85rem; color: #666;">Describe your situation, and the AI will write a formal request.</p>
+                <p style="font-size: 0.85rem; color: #666;">Describe your situation, and the AI will write a formal request for your college reasons.</p>
             </div>
         </div>
     </div>
 
     <div id="standardView" class="hidden">
         <button class="btn btn-outline" onclick="delayedNavigate('homeView')">← BACK TO HOME</button>
-        <h2>EVENT / FEST DL</h2>
+        <h2>STANDARD DL</h2>
         <div class="form-group">
             <label>Full Name</label>
             <input type="text" id="stdName" placeholder="E.G., JANE DOE">
@@ -216,7 +216,7 @@
         </div>
         <div class="form-group">
             <label>Friends Count (0-15)</label>
-            <input type="number" id="numFriends" min="0" max="15" value="0" onchange="generateFriendFields()">
+            <input type="number" id="numFriends" min="0" max="15" placeholder="0" oninput="generateFriendFields()">
         </div>
         <div id="friendsContainer"></div>
         <button class="btn btn-black" onclick="draftStandard()">GENERATE DRAFT</button>
@@ -225,14 +225,39 @@
     <div id="aiView" class="hidden">
         <button class="btn btn-outline" onclick="delayedNavigate('homeView')">← BACK TO HOME</button>
         <h2>AI CUSTOM LETTER</h2>
+        
         <div class="form-group">
-            <label>Your Info</label>
-            <input type="text" id="aiName" placeholder="NAME, DEPT, COLLEGE">
+            <label>Full Name</label>
+            <input type="text" id="aiName" placeholder="E.G., JANE DOE">
         </div>
+        <div class="grid" style="margin-top: 0; margin-bottom: 1.2rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label>DEPT / CLASS</label>
+                <input type="text" id="aiDept" placeholder="2ND YEAR BCA">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label>DATE</label>
+                <input type="date" id="aiDate">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>College Name</label>
+            <input type="text" id="aiCollege" placeholder="COLLEGE NAME">
+        </div>
+
+        <hr>
+
         <div class="form-group">
             <label>What happened?</label>
-            <textarea id="aiPrompt" placeholder="DESCRIBE THE EVENT YOU ATTENDED..."></textarea>
+            <textarea id="aiPrompt" placeholder="DESCRIBE THE REASON OF YOUR LETTER..."></textarea>
         </div>
+
+        <div class="form-group">
+            <label>Friends Count (0-15)</label>
+            <input type="number" id="numFriendsAI" min="0" max="15" placeholder="0" oninput="generateFriendFieldsAI()">
+        </div>
+        <div id="friendsContainerAI"></div>
+
         <button class="btn btn-black" onclick="draftWithAI()">ASK AI TO DRAFT</button>
     </div>
 

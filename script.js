@@ -145,36 +145,69 @@ function downloadPDF() {
     const doc = new jsPDF();
     const margin = 20;
     
-    // Grab the entire text block from the giant text area
+    // Get the event name for the filename
+    const eventInput = document.getElementById('stdEvent').value.trim();
+    // If event name is empty (like in AI mode), fallback to "Leave_Letter"
+    const fileName = eventInput ? `${eventInput} DL.pdf` : "Leave_Letter.pdf";
+
     const fullText = document.getElementById('fullDraftLetter').value;
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
     
-    // Split the entire text block to ensure it wraps correctly at the page margins
     const splitText = doc.splitTextToSize(fullText, 170);
-    
-    // Print the entire array of lines to the PDF starting at the top margin
     doc.text(splitText, margin, 20);
 
-    doc.save("Leave_Letter.pdf");
+    // Use the dynamic filename here
+    doc.save(fileName);
 }
 
 // Dynamically generates input fields based on the number selected
+// Function for Standard View Friends (Instant Update with 15 Limit)
 function generateFriendFields() {
-    const num = parseInt(document.getElementById('numFriends').value) || 0;
-    const container = document.getElementById('friendsContainer');
+    let numInput = document.getElementById('numFriends').value;
     
-    // Clear the container first in case the user changes the number down
+    // LIMITER: If user types more than 15, force it back to 15
+    if (parseInt(numInput) > 15) {
+        document.getElementById('numFriends').value = 15;
+        numInput = 15;
+    }
+
+    const num = numInput === "" ? 0 : parseInt(numInput);
+    const container = document.getElementById('friendsContainer');
     container.innerHTML = ''; 
 
     for (let i = 1; i <= num; i++) {
         const div = document.createElement('div');
         div.className = 'form-group';
-        // Notice we are giving all these inputs the same class name: 'friend-name'
         div.innerHTML = `
-            <label style="color: #4b5563; font-size: 0.85rem;">Person ${i} Name</label>
-            <input type="text" class="friend-name" placeholder="Name of Person ${i}">
+            <label style="color: #ffffff; font-size: 0.8rem; font-weight: 900; text-transform: uppercase;">Friend ${i} Name</label>
+            <input type="text" class="friend-name" placeholder="E.G., JOHN DOE">
+        `;
+        container.appendChild(div);
+    }
+}
+
+// Function for AI View Friends (Instant Update with 15 Limit)
+function generateFriendFieldsAI() {
+    let numInput = document.getElementById('numFriendsAI').value;
+
+    // LIMITER: If user types more than 15, force it back to 15
+    if (parseInt(numInput) > 15) {
+        document.getElementById('numFriendsAI').value = 15;
+        numInput = 15;
+    }
+
+    const num = numInput === "" ? 0 : parseInt(numInput);
+    const container = document.getElementById('friendsContainerAI');
+    container.innerHTML = ''; 
+
+    for (let i = 1; i <= num; i++) {
+        const div = document.createElement('div');
+        div.className = 'form-group';
+        div.innerHTML = `
+            <label style="color: #ffffff; font-size: 0.8rem; font-weight: 900; text-transform: uppercase;">Friend ${i} Name</label>
+            <input type="text" class="friend-name-ai" placeholder="E.G., JOHN DOE">
         `;
         container.appendChild(div);
     }
