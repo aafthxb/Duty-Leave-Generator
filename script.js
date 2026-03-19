@@ -22,6 +22,11 @@ function navigate(viewId) {
 // Generates the standard event draft
 // Generates the standard event draft
 function draftStandard() {
+    const now = new Date();
+    const CURRENT_DATE = String(now.getDate()).padStart(2, '0');
+    const CURRENT_MONTH = String(now.getMonth() + 1).padStart(2, '0');
+    const CURRENT_YEAR = now.getFullYear();
+    
     const name = document.getElementById('stdName').value || "[Your Name]";
     const department = document.getElementById('stdDepartment').value || "[Your Department]";
     const college = document.getElementById('stdCollege').value || "[Your College Name]";
@@ -70,7 +75,7 @@ The Class Tutor,
 ${department},
 ${college}
 
-Date: ${dateTime}
+Date: ${CURRENT_DATE}-${CURRENT_MONTH}-${CURRENT_YEAR}
 
 Subject: Request for On-Duty (OD) Leave
 
