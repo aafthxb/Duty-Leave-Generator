@@ -13,8 +13,7 @@
             margin: 0;
             display: flex; 
             justify-content: center; 
-            /* RE-CENTERED VERTICALLY */
-            align-items: center; 
+            align-items: center; /* Centered for all views */
             min-height: 100vh; 
             padding: 20px; 
             box-sizing: border-box;
@@ -28,21 +27,15 @@
             width: 100%; 
             max-width: 500px; 
             box-sizing: border-box;
-            /* HELPS CENTERING IN FLEXBOX */
-            margin: auto; 
+            margin: auto; /* Absolute centering trick */
         }
 
-        /* MOBILE SPECIFIC TWEAK */
         @media (max-width: 480px) {
-            body {
-                /* On very small screens, if the card is longer than the screen, 
-                   it will start from the top so nothing is cut off */
-                align-items: flex-start;
-            }
+            /* Removed flex-start to maintain centering */
             .card { 
                 padding: 1.2rem; 
-                margin-top: 2rem; 
-                margin-bottom: 2rem;
+                margin-top: auto; 
+                margin-bottom: auto;
             }
             h2 { font-size: 1.3rem; }
             .grid { gap: 0.8rem; }
@@ -55,13 +48,12 @@
             margin-top: 1.5rem; 
         }
         
-        /* HOME PAGE CARDS */
         .option-card { 
             border: 2px solid #ffffff; 
             padding: 1.2rem; 
             text-align: center; 
             cursor: pointer; 
-            transition: all 0.1s; 
+            transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             background: #000000; 
             font-weight: bold;
             text-transform: uppercase;
@@ -96,7 +88,6 @@
             font-family: inherit;
         }
         
-        /* UNIVERSAL BUTTON LOGIC - FIXES MOBILE INTERACTIVITY */
         .btn { 
             width: 100%; 
             padding: 0.9rem; 
@@ -106,19 +97,17 @@
             font-size: 1rem;
             text-transform: uppercase;
             margin-top: 0.8rem; 
-            transition: all 0.05s; /* Faster transition for touch response */
+            transition: all 0.08s ease; 
             position: relative;
             display: block;
             box-sizing: border-box;
         }
 
-        /* This rule applies to ALL buttons when clicked/touched */
         .btn:active {
             transform: translate(3px, 3px) !important;
             box-shadow: 0px 0px 0px transparent !important;
         }
         
-        /* SPECIFIC BUTTON STYLES */
         .btn-black { 
             background: #ffffff; 
             color: #000000; 
@@ -129,7 +118,7 @@
             background: #000000; 
             color: #ffffff; 
             margin-bottom: 1.5rem;
-            box-shadow: 3px 3px 0px #ffffff; /* White shadow for visibility on black */
+            box-shadow: 3px 3px 0px #ffffff;
         }
         
         .btn-blue { 
@@ -161,26 +150,19 @@
             border-left: 4px solid #ffffff;
             padding-left: 0.8rem;
         }
-
-        @media (max-width: 480px) {
-            .card { padding: 1rem; margin-top: 2vh; }
-            h2 { font-size: 1.3rem; }
-            .grid { gap: 0.8rem; }
-        }
     </style>
 </head>
 <body>
 
 <div class="card">
-    
     <div id="homeView">
         <h2>What do you need to draft today?</h2>
         <div class="grid">
-            <div class="option-card" onclick="navigate('standardView')">
+            <div class="option-card" onclick="delayedNavigate('standardView')">
                 <h3>🎟️ Event / Fest DL</h3>
                 <p style="font-size: 0.85rem; color: #666;">Standard formatting for tech fests, ideathons, and duty leave.</p>
             </div>
-            <div class="option-card" onclick="navigate('aiView')">
+            <div class="option-card" onclick="delayedNavigate('aiView')">
                 <h3>✨ Custom AI Letter</h3>
                 <p style="font-size: 0.85rem; color: #666;">Describe your situation, and the AI will write a formal request.</p>
             </div>
@@ -188,9 +170,8 @@
     </div>
 
     <div id="standardView" class="hidden">
-        <button class="btn btn-outline" onclick="navigate('homeView')">← BACK TO HOME</button>
+        <button class="btn btn-outline" onclick="delayedNavigate('homeView')">← BACK TO HOME</button>
         <h2>EVENT / FEST DL</h2>
-        
         <div class="form-group">
             <label>Full Name</label>
             <input type="text" id="stdName" placeholder="E.G., JANE DOE">
@@ -209,9 +190,7 @@
             <label>College Name</label>
             <input type="text" id="stdCollege" placeholder="COLLEGE NAME">
         </div>
-        
         <hr>
-
         <div class="form-group">
             <label>Event Name</label>
             <input type="text" id="stdEvent" placeholder="E.G., NEXORA IDEATHON">
@@ -224,13 +203,12 @@
             <label>Friends Count (0-15)</label>
             <input type="number" id="numFriends" min="0" max="15" value="0" onchange="generateFriendFields()">
         </div>
-        
         <div id="friendsContainer"></div>
         <button class="btn btn-black" onclick="draftStandard()">GENERATE DRAFT</button>
     </div>
 
     <div id="aiView" class="hidden">
-        <button class="btn btn-outline" onclick="navigate('homeView')">← BACK TO HOME</button>
+        <button class="btn btn-outline" onclick="delayedNavigate('homeView')">← BACK TO HOME</button>
         <h2>AI CUSTOM LETTER</h2>
         <div class="form-group">
             <label>Your Info</label>
@@ -244,7 +222,7 @@
     </div>
 
     <div id="editingBay" class="hidden">
-        <button class="btn btn-outline" onclick="navigate('homeView')">← START OVER</button>
+        <button class="btn btn-outline" onclick="delayedNavigate('homeView')">← START OVER</button>
         <h2>REVIEW LETTER</h2>
         <p style="font-size: 0.85rem; color: #888; margin-bottom: 1rem;">
             You can manually adjust the text below before saving it as a PDF.
@@ -254,9 +232,16 @@
         </div>
         <button class="btn btn-blue" onclick="downloadPDF()">DOWNLOAD OFFICIAL PDF</button>
     </div>
-
 </div>
 
+<script>
+    // New function to delay navigation until animation finishes
+    function delayedNavigate(viewId) {
+        setTimeout(() => {
+            navigate(viewId);
+        }, 120); // 120ms delay covers the 0.08s - 0.1s CSS transition
+    }
+</script>
 <script src="script.js"></script>
 </body>
 </html>
