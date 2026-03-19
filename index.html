@@ -13,7 +13,7 @@
             margin: 0;
             display: flex; 
             justify-content: center; 
-            align-items: center; /* Centered for all views */
+            align-items: center; 
             min-height: 100vh; 
             padding: 20px; 
             box-sizing: border-box;
@@ -27,15 +27,26 @@
             width: 100%; 
             max-width: 500px; 
             box-sizing: border-box;
-            margin: auto; /* Absolute centering trick */
+            margin: auto;
+            /* This shifts the box slightly above the dead center */
+            transform: translateY(-8vh); 
+            transition: transform 0.3s ease;
+        }
+
+        /* When inside forms, we reset the translation so long forms don't cut off at the top */
+        .card:has(#standardView:not(.hidden)),
+        .card:has(#aiView:not(.hidden)),
+        .card:has(#editingBay:not(.hidden)) {
+            transform: translateY(0);
         }
 
         @media (max-width: 480px) {
-            /* Removed flex-start to maintain centering */
             .card { 
                 padding: 1.2rem; 
                 margin-top: auto; 
                 margin-bottom: auto;
+                /* Slightly less offset for small screens */
+                transform: translateY(-5vh);
             }
             h2 { font-size: 1.3rem; }
             .grid { gap: 0.8rem; }
@@ -48,16 +59,18 @@
             margin-top: 1.5rem; 
         }
         
+        /* OPTION CARDS (Home Page) */
         .option-card { 
             border: 2px solid #ffffff; 
             padding: 1.2rem; 
             text-align: center; 
             cursor: pointer; 
-            transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            transition: all 0.05s; 
             background: #000000; 
             font-weight: bold;
             text-transform: uppercase;
             box-shadow: 4px 4px 0px #ffffff;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .option-card:active { 
@@ -88,6 +101,7 @@
             font-family: inherit;
         }
         
+        /* BUTTONS */
         .btn { 
             width: 100%; 
             padding: 0.9rem; 
@@ -97,10 +111,11 @@
             font-size: 1rem;
             text-transform: uppercase;
             margin-top: 0.8rem; 
-            transition: all 0.08s ease; 
+            transition: all 0.05s; 
             position: relative;
             display: block;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .btn:active {
@@ -235,11 +250,13 @@
 </div>
 
 <script>
-    // New function to delay navigation until animation finishes
     function delayedNavigate(viewId) {
+        // Delay to allow the click/active animation to finish
         setTimeout(() => {
-            navigate(viewId);
-        }, 120); // 120ms delay covers the 0.08s - 0.1s CSS transition
+            if (typeof navigate === "function") {
+                navigate(viewId);
+            }
+        }, 150); 
     }
 </script>
 <script src="script.js"></script>
