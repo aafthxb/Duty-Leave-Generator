@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Drafter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body { 
+            font-family: 'Courier New', monospace; /* Classic brutalist mono font */
+            background: #000000; 
+            color: #ffffff; 
+            margin: 0;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 20px; 
+            box-sizing: border-box;
+        }
+        
+        .card { 
+            background: #000000; 
+            padding: 2.5rem; 
+            /* Hard edges, no curves */
+            border: 3px solid #ffffff; 
+            /* Hard "Shadow" - typical of Neo-Brutalism */
+            box-shadow: 8px 8px 0px #ffffff; 
+            width: 100%; 
+            max-width: 600px; 
+            box-sizing: border-box;
+            margin: auto; 
+        }
+        
+        .grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 1.5rem; 
+            margin-top: 2rem; 
+        }
+        
+        .option-card { 
+            border: 3px solid #ffffff; 
+            padding: 1.5rem; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: transform 0.1s; 
+            background: #000000; 
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .option-card:hover { 
+            background: #ffffff; 
+            color: #000000;
+            transform: translate(-4px, -4px);
+            box-shadow: 4px 4px 0px #ffffff;
+        }
+        
+        .form-group { margin-bottom: 1.5rem; }
+        
+        label { 
+            display: block; 
+            font-weight: 900; 
+            margin-bottom: 0.5rem; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        input, textarea, select { 
+            width: 100%; 
+            padding: 0.8rem; 
+            background: #000000; 
+            color: #ffffff;
+            border: 3px solid #ffffff; 
+            border-radius: 0px; /* Sharp corners */
+            box-sizing: border-box; 
+            font-size: 1rem;
+            color-scheme: dark; 
+            font-family: inherit;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            background: #111;
+        }
+        
+        .btn { 
+            width: 100%; 
+            padding: 1rem; 
+            border: 3px solid #ffffff; 
+            cursor: pointer; 
+            font-weight: 900; 
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            margin-top: 1rem; 
+            transition: all 0.1s;
+        }
+        
+        /* Primary Buttons */
+        .btn-black { 
+            background: #ffffff; 
+            color: #000000; 
+            box-shadow: 5px 5px 0px #444;
+        } 
+        
+        .btn-black:hover { 
+            transform: translate(-2px, -2px);
+            box-shadow: 7px 7px 0px #444;
+        }
+
+        .btn-black:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px;
+        }
+
+        .btn-outline { 
+            background: #000000; 
+            color: #ffffff; 
+            margin-bottom: 2rem;
+        }
+        
+        .btn-outline:hover { 
+            background: #333;
+        }
+
+        .btn-blue { 
+            background: #0044ff; /* Strong Primary Blue */
+            color: #ffffff; 
+            box-shadow: 5px 5px 0px #002288;
+        }
+        
+        .hidden { display: none !important; }
+        
+        h2 { 
+            font-size: 2rem; 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            margin-bottom: 1.5rem;
+            line-height: 1;
+        }
+        
+        hr { 
+            border: 0; 
+            border-top: 3px solid #ffffff; 
+            margin: 2.5rem 0; 
+        }
+
+        #friendsContainer .form-group {
+            border-left: 5px solid #ffffff;
+            padding-left: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    
+    <div id="homeView">
+        <h2>What do you need to draft today?</h2>
+        <div class="grid">
+            <div class="option-card" onclick="navigate('standardView')">
+                <h3>🎟️ Event / Fest DL</h3>
+                <p style="font-size: 0.85rem; color: #666;">Standard formatting for tech fests, ideathons, and duty leave.</p>
+            </div>
+            <div class="option-card" onclick="navigate('aiView')">
+                <h3>✨ Custom AI Letter</h3>
+                <p style="font-size: 0.85rem; color: #666;">Describe your situation, and the AI will write a formal request.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="standardView" class="hidden">
+        <button class="btn btn-outline" onclick="navigate('homeView')">← Back to Home</button>
+        <h2>Standard Event DL</h2>
+        
+        <div class="form-group">
+            <label>Your Name</label>
+            <input type="text" id="stdName" placeholder="e.g., Jane Doe">
+        </div>
+        <div class="form-group">
+            <label>Department / Class</label>
+            <input type="text" id="stdDepartment" placeholder="e.g., 2nd Year BCA">
+        </div>
+        <div class="form-group">
+            <label>College Name</label>
+            <input type="text" id="stdCollege" placeholder="e.g., ABC College of Arts and Science">
+        </div>
+        
+        <hr style="margin: 1.5rem 0; border-top: 1px dashed #ccc;">
+
+        <div class="form-group">
+            <label>Event Name</label>
+            <input type="text" id="stdEvent" placeholder="e.g., Nexora Ideathon">
+        </div>
+        <div class="form-group">
+            <label>Event Location (Institution/City)</label>
+            <input type="text" id="stdLocation" placeholder="e.g., JDT Islam Arts and Science College">
+        </div>
+        <div class="form-group">
+            <label>Date of Leave</label>
+            <input type="date" id="stdDateTime">
+        </div>
+        <div class="form-group">
+            <label>Number of Accompanying Friends (Leave at 0 if alone)</label>
+            <input type="number" id="numFriends" min="0" max="15" value="0" onchange="generateFriendFields()">
+        </div>
+        
+        <div id="friendsContainer"></div>
+        <button class="btn btn-black" onclick="draftStandard()">Generate Draft</button>
+    </div>
+
+    <div id="aiView" class="hidden">
+        <button class="btn btn-outline" onclick="navigate('homeView')">← Back to Home</button>
+        <h2>AI Custom Letter</h2>
+        <div class="form-group">
+            <label>Your Name & Department</label>
+            <input type="text" id="aiName" placeholder="e.g., Jane Doe, 2nd Year BCA">
+        </div>
+        <div class="form-group">
+            <label>Reason for Leave</label>
+            <textarea id="aiPrompt" placeholder="Briefly describe why you need leave..."></textarea>
+        </div>
+        <button class="btn btn-black" onclick="draftWithAI()">Ask AI to Draft</button>
+    </div>
+
+    <div id="editingBay" class="hidden" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #333;">
+        <h2>Review & Edit Complete Letter</h2>
+        <p style="font-size: 0.85rem; color: #888; margin-bottom: 1rem;">
+            You can manually adjust the text below before saving it as a PDF.
+        </p>
+        
+        <div class="form-group">
+            <textarea id="fullDraftLetter" style="min-height: 400px; font-family: monospace; white-space: pre-wrap; line-height: 1.5;"></textarea>
+        </div>
+        
+        <button class="btn btn-blue" onclick="downloadPDF()">Download Official PDF</button>
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
