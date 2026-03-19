@@ -13,7 +13,8 @@
             margin: 0;
             display: flex; 
             justify-content: center; 
-            align-items: flex-start; 
+            /* RE-CENTERED VERTICALLY */
+            align-items: center; 
             min-height: 100vh; 
             padding: 20px; 
             box-sizing: border-box;
@@ -27,8 +28,24 @@
             width: 100%; 
             max-width: 500px; 
             box-sizing: border-box;
-            margin-top: 5vh; 
-            margin-bottom: 5vh; 
+            /* HELPS CENTERING IN FLEXBOX */
+            margin: auto; 
+        }
+
+        /* MOBILE SPECIFIC TWEAK */
+        @media (max-width: 480px) {
+            body {
+                /* On very small screens, if the card is longer than the screen, 
+                   it will start from the top so nothing is cut off */
+                align-items: flex-start;
+            }
+            .card { 
+                padding: 1.2rem; 
+                margin-top: 2rem; 
+                margin-bottom: 2rem;
+            }
+            h2 { font-size: 1.3rem; }
+            .grid { gap: 0.8rem; }
         }
         
         .grid { 
@@ -38,6 +55,7 @@
             margin-top: 1.5rem; 
         }
         
+        /* HOME PAGE CARDS */
         .option-card { 
             border: 2px solid #ffffff; 
             padding: 1.2rem; 
@@ -47,13 +65,12 @@
             background: #000000; 
             font-weight: bold;
             text-transform: uppercase;
+            box-shadow: 4px 4px 0px #ffffff;
         }
         
-        .option-card:hover { 
-            background: #ffffff; 
-            color: #000000;
-            transform: translate(-3px, -3px);
-            box-shadow: 3px 3px 0px #ffffff;
+        .option-card:active { 
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px #ffffff;
         }
         
         .form-group { margin-bottom: 1.2rem; }
@@ -79,7 +96,7 @@
             font-family: inherit;
         }
         
-        /* UNIVERSAL BUTTON INTERACTIVITY */
+        /* UNIVERSAL BUTTON LOGIC - FIXES MOBILE INTERACTIVITY */
         .btn { 
             width: 100%; 
             padding: 0.9rem; 
@@ -89,42 +106,37 @@
             font-size: 1rem;
             text-transform: uppercase;
             margin-top: 0.8rem; 
-            transition: all 0.1s ease;
+            transition: all 0.05s; /* Faster transition for touch response */
             position: relative;
+            display: block;
+            box-sizing: border-box;
         }
 
-        /* Hover: Lift the button */
-        .btn:hover {
-            transform: translate(-2px, -2px);
-        }
-
-        /* Active: Press the button down */
+        /* This rule applies to ALL buttons when clicked/touched */
         .btn:active {
-            transform: translate(2px, 2px);
-            box-shadow: 0px 0px 0px !important;
+            transform: translate(3px, 3px) !important;
+            box-shadow: 0px 0px 0px transparent !important;
         }
         
+        /* SPECIFIC BUTTON STYLES */
         .btn-black { 
             background: #ffffff; 
             color: #000000; 
             box-shadow: 4px 4px 0px #666;
         } 
-        .btn-black:hover { box-shadow: 6px 6px 0px #666; }
         
         .btn-outline { 
             background: #000000; 
             color: #ffffff; 
             margin-bottom: 1.5rem;
-            box-shadow: 3px 3px 0px #333;
+            box-shadow: 3px 3px 0px #ffffff; /* White shadow for visibility on black */
         }
-        .btn-outline:hover { box-shadow: 5px 5px 0px #333; }
         
         .btn-blue { 
             background: #0044ff; 
             color: #ffffff; 
             box-shadow: 4px 4px 0px #002288;
         }
-        .btn-blue:hover { box-shadow: 6px 6px 0px #002288; }
         
         .hidden { display: none !important; }
         
