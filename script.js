@@ -57,10 +57,10 @@ function draftStandard() {
     // NEW: Clean "I vs We" grammar check (Past Tense version)
     if (friendsArray.length > 0) {
         // Group format
-        bodyText = `We are writing to formally request Duty Leave (DL) for our absence on ${dateTime}. We participated in the ${eventName} held at ${eventLocation}.\n\nAttending this event provided us with valuable practical exposure. We will ensure that any coursework missed during this period is completed promptly.`;
+        bodyText = `We are writing to formally request Duty Leave (DL) / Attendance for our absence on ${dateTime}. We participated in the ${eventName} held at ${eventLocation}.\n\nAttending this event provided us with valuable practical exposure. We will ensure that any coursework missed during this period is completed promptly.`;
     } else {
         // Solo format
-        bodyText = `I am writing to formally request Duty Leave (DL) for my absence on ${dateTime}. I participated in the ${eventName} held at ${eventLocation}.\n\nAttending this event provided valuable practical exposure. I will ensure that any coursework missed during this period is completed promptly.`;
+        bodyText = `I am writing to formally request Duty Leave (DL) / Attendance for my absence on ${dateTime}. I participated in the ${eventName} held at ${eventLocation}.\n\nAttending this event provided valuable practical exposure. I will ensure that any coursework missed during this period is completed promptly.`;
     }
 
     const fullLetter = 
