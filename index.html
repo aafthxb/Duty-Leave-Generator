@@ -28,12 +28,11 @@
             max-width: 500px; 
             box-sizing: border-box;
             margin: auto;
-            /* This shifts the box slightly above the dead center */
             transform: translateY(-8vh); 
             transition: transform 0.3s ease;
+            position: relative; /* Required for the popup positioning */
         }
 
-        /* When inside forms, we reset the translation so long forms don't cut off at the top */
         .card:has(#standardView:not(.hidden)),
         .card:has(#aiView:not(.hidden)),
         .card:has(#editingBay:not(.hidden)) {
@@ -43,9 +42,6 @@
         @media (max-width: 480px) {
             .card { 
                 padding: 1.2rem; 
-                margin-top: auto; 
-                margin-bottom: auto;
-                /* Slightly less offset for small screens */
                 transform: translateY(-5vh);
             }
             h2 { font-size: 1.3rem; }
@@ -59,7 +55,6 @@
             margin-top: 1.5rem; 
         }
         
-        /* OPTION CARDS (Home Page) */
         .option-card { 
             border: 2px solid #ffffff; 
             padding: 1.2rem; 
@@ -101,7 +96,6 @@
             font-family: inherit;
         }
         
-        /* BUTTONS */
         .btn { 
             width: 100%; 
             padding: 0.9rem; 
@@ -161,9 +155,49 @@
             margin: 1.5rem 0; 
         }
 
-        #friendsContainer .form-group {
+        #friendsContainer .form-group, #friendsContainerAI .form-group {
             border-left: 4px solid #ffffff;
             padding-left: 0.8rem;
+        }
+
+        /* --- AI VIEW SPECIAL STYLES --- */
+        .blur-effect {
+            filter: blur(5px);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .coming-soon-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            background: rgba(0,0,0,0.4); /* Slight dimming */
+        }
+
+        .popup-box {
+            background: #000;
+            border: 3px solid #fff;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 10px 10px 0px #fff;
+            max-width: 80%;
+        }
+
+        .popup-box h2 {
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .popup-box p {
+            color: #aaa;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -223,42 +257,52 @@
     </div>
 
     <div id="aiView" class="hidden">
-        <button class="btn btn-outline" onclick="delayedNavigate('homeView')">← BACK TO HOME</button>
-        <h2>AI CUSTOM LETTER</h2>
-        
-        <div class="form-group">
-            <label>Full Name</label>
-            <input type="text" id="aiName" placeholder="E.G., JANE DOE">
-        </div>
-        <div class="grid" style="margin-top: 0; margin-bottom: 1.2rem;">
-            <div class="form-group" style="margin-bottom: 0;">
-                <label>DEPT / CLASS</label>
-                <input type="text" id="aiDept" placeholder="2ND YEAR BCA">
-            </div>
-            <div class="form-group" style="margin-bottom: 0;">
-                <label>DATE</label>
-                <input type="date" id="aiDate">
+        <div class="coming-soon-overlay">
+            <div class="popup-box">
+                <h2>COMING SOON</h2>
+                <p>We are still training the AI to handle your complex requests perfectly.</p>
+                <button class="btn btn-outline" onclick="delayedNavigate('homeView')" style="margin-bottom: 0;">← BACK TO HOME</button>
             </div>
         </div>
-        <div class="form-group">
-            <label>College Name</label>
-            <input type="text" id="aiCollege" placeholder="COLLEGE NAME">
+
+        <div class="blur-effect">
+            <button class="btn btn-outline" onclick="delayedNavigate('homeView')">← BACK TO HOME</button>
+            <h2>AI CUSTOM LETTER</h2>
+            
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="aiName" placeholder="E.G., JANE DOE" tabindex="-1">
+            </div>
+            <div class="grid" style="margin-top: 0; margin-bottom: 1.2rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>DEPT / CLASS</label>
+                    <input type="text" id="aiDept" placeholder="2ND YEAR BCA" tabindex="-1">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>DATE</label>
+                    <input type="date" id="aiDate" tabindex="-1">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>College Name</label>
+                <input type="text" id="aiCollege" placeholder="COLLEGE NAME" tabindex="-1">
+            </div>
+
+            <hr>
+
+            <div class="form-group">
+                <label>What happened?</label>
+                <textarea id="aiPrompt" placeholder="DESCRIBE THE REASON..." tabindex="-1"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Friends Count (0-15)</label>
+                <input type="number" id="numFriendsAI" min="0" max="15" placeholder="0" oninput="generateFriendFieldsAI()" tabindex="-1">
+            </div>
+            <div id="friendsContainerAI"></div>
+
+            <button class="btn btn-black" onclick="draftWithAI()" tabindex="-1">ASK AI TO DRAFT</button>
         </div>
-
-        <hr>
-
-        <div class="form-group">
-            <label>What happened?</label>
-            <textarea id="aiPrompt" placeholder="DESCRIBE THE REASON OF YOUR LETTER..."></textarea>
-        </div>
-
-        <div class="form-group">
-            <label>Friends Count (0-15)</label>
-            <input type="number" id="numFriendsAI" min="0" max="15" placeholder="0" oninput="generateFriendFieldsAI()">
-        </div>
-        <div id="friendsContainerAI"></div>
-
-        <button class="btn btn-black" onclick="draftWithAI()">ASK AI TO DRAFT</button>
     </div>
 
     <div id="editingBay" class="hidden">
@@ -276,7 +320,6 @@
 
 <script>
     function delayedNavigate(viewId) {
-        // Delay to allow the click/active animation to finish
         setTimeout(() => {
             if (typeof navigate === "function") {
                 navigate(viewId);
