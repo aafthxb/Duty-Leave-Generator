@@ -15,14 +15,6 @@ function navigate(viewId) {
     
     document.getElementById(viewId).classList.remove('hidden');
 
-    if (viewId === 'homeView') {
-        document.getElementById('logoContainer').classList.remove('hidden');
-    } else {
-        document.getElementById('logoContainer').classList.add('hidden');
-    }
-    // -----------------------
-
-    document.getElementById(viewId).classList.remove('hidden');
 }
 
 // Generates the standard event draft
