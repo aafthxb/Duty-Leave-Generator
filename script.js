@@ -337,8 +337,10 @@ async function draftAI() {
     REASON: ${reason}
     REQUIREMENTS: 
     1. Output RAW TEXT ONLY. No Markdown, no asterisks (**), no hashtags.
-    2. Under the sign-off, ONLY output the sender's name (${fromName}) directly on the next line.
-    `;
+    2. SUBJECT LINE: Keep the subject line concise (e.g., "Subject: Request for Medical Leave"). 
+       DO NOT include the sender's name, department, or any other personal details in the subject line.
+    3. At the very end of the letter, under the sign-off, ONLY output the sender's name (${fromName}) directly on the next line.
+`;
 
     try {
         // CALL YOUR VERCEL API INSTEAD OF GOOGLE DIRECTLY
