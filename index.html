@@ -11,16 +11,16 @@
     <meta property="og:url" content="https://formal-letter-omega.vercel.app/"> 
     <meta property="og:title" content="Formal Letter">
     <meta property="og:description" content="The ultimate formal letter drafter. Standard DLs, AI-powered requests, and instant PDF downloads for students.">
-    <meta property="og:image" content="https://formal-letter-omega.vercel.app/media/logo.png">
+    <meta property="og:image" content="https://formal-letter-omega.vercel.app/assets/logo.png">
 
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://formal-letter-omega.vercel.app/">
     <meta property="twitter:title" content="Formal Letter">
     <meta property="twitter:description" content="The ultimate formal letter drafter. Standard DLs, AI-powered requests, and instant PDF downloads for students.">
-    <meta property="twitter:image" content="https://formal-letter-omega.vercel.app/media/logo.png">
+    <meta property="twitter:image" content="https://formal-letter-omega.vercel.app/assets/logo.png">
 
     <title>Formal Letter</title>
-    <link rel="icon" type="image/svg+xml" href="media/logo.svg">
+    <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body { 
@@ -248,28 +248,41 @@
                 <label>DEPT / CLASS</label>
                 <input type="text" id="stdDepartment" placeholder="2ND YEAR BCA">
             </div>
-            <div class="form-group" style="margin-bottom: 0;">
-                <label>DATE OF EVENT</label>
-                <input type="date" id="stdDateTime">
-            </div>
+            
         </div>
         <div class="form-group">
-            <label>College Name</label>
-            <input type="text" id="stdCollege" placeholder="COLLEGE NAME">
-        </div>
-        <hr>
-        <div class="form-group">
-            <label>Event Name</label>
-            <input type="text" id="stdEvent" placeholder="E.G., NEXORA IDEATHON">
-        </div>
-        <div class="form-group">
-            <label>Location</label>
-            <input type="text" id="stdLocation" placeholder="INSTITUTION / CITY">
-        </div>
-        <div class="form-group">
-            <label>Friends Count (0-15)</label>
-            <input type="number" id="numFriends" min="0" max="15" placeholder="0" oninput="generateFriendFields()">
-        </div>
+    <label>College Name</label>
+    <input type="text" id="stdCollege" placeholder="COLLEGE NAME">
+</div>
+
+<div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: -5px;">
+    <input type="checkbox" id="rememberMe" style="width: 18px; height: 18px; cursor: pointer;">
+    <label style="margin-bottom: 0; cursor: pointer;" for="rememberMe">Remember My Details</label>
+</div>
+
+<hr>
+
+<div class="form-group">
+    <label>Event Name</label>
+    <input type="text" id="stdEvent" placeholder="E.G., NEXORA IDEATHON">
+</div>
+
+<div class="form-group">
+    <label>Location</label>
+    <input type="text" id="stdLocation" placeholder="INSTITUTION / CITY">
+</div>
+
+<div class="grid" style="margin-top: 0; margin-bottom: 1.2rem;">
+    
+    <div class="form-group" style="margin-bottom: 0;">
+        <label>Friends Count (0-15)</label>
+        <input type="number" id="numFriends" min="0" max="15" placeholder="0" oninput="generateFriendFields()">
+    </div>
+    <div class="form-group" style="margin-bottom: 0;">
+        <label>DATE OF EVENT</label>
+        <input type="date" id="stdDateTime">
+    </div>
+</div>
         <div id="friendsContainer"></div>
         <button class="btn btn-black" onclick="draftStandard()">GENERATE DRAFT</button>
     </div>

@@ -18,11 +18,20 @@ function navigate(viewId) {
 }
 
 // Generates the standard event draft
-// Generates the standard event draft
-// Generates the standard event draft
-// Generates the standard event draft
-// Generates the standard event draft
 function draftStandard() {
+    // Inside draftStandard()
+const rememberCheckbox = document.getElementById('rememberMe').checked;
+
+if (rememberCheckbox) {
+    const userData = {
+        name: document.getElementById('stdName').value,
+        dept: document.getElementById('stdDepartment').value,
+        college: document.getElementById('stdCollege').value
+    };
+    localStorage.setItem('savedUser', JSON.stringify(userData));
+} else {
+    localStorage.removeItem('savedUser');
+}
     const now = new Date();
     const CURRENT_DATE = String(now.getDate()).padStart(2, '0');
     const CURRENT_MONTH = String(now.getMonth() + 1).padStart(2, '0');
@@ -218,3 +227,24 @@ function generateFriendFieldsAI() {
         container.appendChild(div);
     }
 }
+
+// Auto-fill on page load
+window.addEventListener('DOMContentLoaded', () => {
+    const savedData = localStorage.getItem('savedUser');
+    if (savedData) {
+        const data = JSON.parse(savedData);
+        
+        // Fill the Standard View fields
+        if(document.getElementById('stdName')) document.getElementById('stdName').value = data.name || "";
+        if(document.getElementById('stdDepartment')) document.getElementById('stdDepartment').value = data.dept || "";
+        if(document.getElementById('stdCollege')) document.getElementById('stdCollege').value = data.college || "";
+        
+        // Also fill the AI View fields (optional but helpful)
+        if(document.getElementById('aiName')) document.getElementById('aiName').value = data.name || "";
+        if(document.getElementById('aiDept')) document.getElementById('aiDept').value = data.dept || "";
+        if(document.getElementById('aiCollege')) document.getElementById('aiCollege').value = data.college || "";
+        
+        // Keep the checkbox checked
+        if(document.getElementById('rememberMe')) document.getElementById('rememberMe').checked = true;
+    }
+});
