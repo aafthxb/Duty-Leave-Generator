@@ -1,7 +1,7 @@
 const { jsPDF } = window.jspdf;
 
-// Paste your free Gemini API Key here
-const API_KEY = 'YOUR_API_KEY_HERE'; 
+// 1. Paste your actual free Gemini API Key here (It should look like 'AIzaSy...')
+const API_KEY = 'you should paste your real API key here, starting with AIza...'; 
 
 // Simple Router to switch between views
 function navigate(viewId) {
@@ -24,14 +24,12 @@ function delayedNavigate(viewId) {
 
 // Generates the standard event draft
 function draftStandard() {
-    // 1. Gather User Details
     const name = document.getElementById('stdName').value || "[Your Name]";
     const department = document.getElementById('stdDepartment').value || "[Your Department]";
     const college = document.getElementById('stdCollege').value || "[Your College Name]";
     const eventName = document.getElementById('stdEvent').value || "[Event Name]";
     const eventLocation = document.getElementById('stdLocation').value || "[Event Location]";
     
-    // 2. Remember Me Logic
     const rememberCheckbox = document.getElementById('rememberMe').checked;
     if (rememberCheckbox) {
         const userData = { name, dept: department, college };
@@ -40,7 +38,6 @@ function draftStandard() {
         localStorage.removeItem('savedUser');
     }
 
-    // 3. Date & Multi-day Logic
     const isMulti = document.getElementById('isMultiDay').checked;
     const rawDate = document.getElementById('stdDateTime').value;
     const rawEndDate = document.getElementById('stdEndDateTime').value;
@@ -60,11 +57,9 @@ function draftStandard() {
         }
     }
 
-    // 4. Current Date for Header
     const now = new Date();
     const todayStr = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
 
-    // 5. Friends Logic
     const friendInputs = document.querySelectorAll('.friend-name');
     let friendsArray = [];
     friendInputs.forEach(input => {
@@ -74,41 +69,43 @@ function draftStandard() {
     const allNamesArray = [name, ...friendsArray];
     const signatureBlock = allNamesArray.join('\n');
 
-    // 6. Body Construction
     let bodyText = friendsArray.length > 0 
-        ? `We are writing to formally request Duty Leave (DL) / Attendance for our absence ${dateString}. We participated in the ${eventName} held at ${eventLocation}.\n\nAttending this event provided us with valuable practical exposure. We will ensure that any coursework missed during this period is completed promptly.`
+        ? `I am writing to formally request Duty Leave (DL) / Attendance for our absence ${dateString}. We participated in the ${eventName} held at ${eventLocation}.\n\nAttending this event provided us with valuable practical exposure. We will ensure that any coursework missed during this period is completed promptly.`
         : `I am writing to formally request Duty Leave (DL) / Attendance for my absence ${dateString}. I participated in the ${eventName} held at ${eventLocation}.\n\nAttending this event provided me with valuable practical exposure. I will ensure that any coursework missed during this period is completed promptly.`;
 
-    const fullLetter = `To,
-The Class Tutor,
-${department},
+    const fullLetter = `${name}
+${department}
 ${college}
 
-Date: ${todayStr}
+${todayStr}
 
-Subject: Request for On-Duty (OD) Leave
+The Class Tutor
+${department}
+${college}
 
 Respected Sir/Madam,
+
+Subject: Request for Duty Leave (DL) / Attendance
 
 ${bodyText}
 
 Thank you for your time and consideration.
 
 Yours faithfully,
-
 ${signatureBlock}`;
 
-    // 7. DISPLAY RESULT BELOW (Scrolling behavior)
     const editingBay = document.getElementById('editingBay');
-    document.getElementById('fullDraftLetter').value = fullLetter;
+    const draftArea = document.getElementById('fullDraftLetter');
     
-    // Reveal the editing bay WITHOUT hiding the form
+    draftArea.value = fullLetter;
+    
+    // Set dynamic filename based on standard view
+    const safeEventName = eventName !== "[Event Name]" ? eventName : "Event";
+    draftArea.setAttribute('data-filename', `${safeEventName} DL.pdf`);
+    
     editingBay.classList.remove('hidden');
-    
-    // Smooth scroll down to the result
     editingBay.scrollIntoView({ behavior: 'smooth' });
 
-    // 8. Save to History
     saveToHistory({
         eventName: eventName !== "[Event Name]" ? eventName : "Standard Request",
         date: histDateDisplay,
@@ -124,7 +121,6 @@ ${signatureBlock}`;
     });
 }
 
-// Toggle logic for the multi-day UI
 function toggleDateRange() {
     const isMulti = document.getElementById('isMultiDay').checked;
     const endGroup = document.getElementById('endDateGroup');
@@ -139,8 +135,6 @@ function toggleDateRange() {
     }
 }
 
-// --- HISTORY & OTHER UTILS ---
-
 function saveToHistory(entryData) {
     let history = JSON.parse(localStorage.getItem('letterHistory') || '[]');
     history.unshift(entryData);
@@ -151,6 +145,7 @@ function saveToHistory(entryData) {
 function loadHistory() {
     const history = JSON.parse(localStorage.getItem('letterHistory') || '[]');
     const container = document.getElementById('historyListContainer');
+    if(!container) return;
     container.innerHTML = ''; 
 
     if (history.length === 0) {
@@ -161,11 +156,20 @@ function loadHistory() {
     history.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = 'option-card'; 
-        div.style.textAlign = 'left'; // Reverted to original left alignment
+        div.style.textAlign = 'left';
         div.onclick = () => openHistoryDetail(index);
+
+        // Logic to switch between Standard and AI formatting
+        let subtext = "";
+        if (item.eventName === "AI Custom Letter") {
+            subtext = `To: ${item.recipient || '[Recipient]'}`;
+        } else {
+            subtext = `${item.date} | Friends: ${item.friendsCount}`;
+        }
+
         div.innerHTML = `
             <div style="font-size: 1.1rem; font-weight: 900; text-transform: uppercase; color: #ffffff;">${item.eventName}</div>
-            <div style="font-size: 0.8rem; color: #aaa;">${item.date} | Friends: ${item.friendsCount}</div>
+            <div style="font-size: 0.8rem; color: #aaa;">${subtext}</div>
             <div style="font-size: 0.7rem; color: #666; margin-top: 5px; text-transform: uppercase;">Generated: ${item.generatedAt || 'N/A'}</div>
         `;
         container.appendChild(div);
@@ -176,11 +180,10 @@ function openHistoryDetail(index) {
     const history = JSON.parse(localStorage.getItem('letterHistory') || '[]');
     const item = history[index];
     if (item) {
-        document.getElementById('historyFullDraftLetter').value = item.letterText;
-        document.getElementById('historyFullDraftLetter').setAttribute('data-event', item.eventName); 
+        const draftArea = document.getElementById('historyFullDraftLetter');
+        draftArea.value = item.letterText;
+        draftArea.setAttribute('data-event', item.eventName); 
         delayedNavigate('historyDetailView');
-        
-        // Nudge the scroll to the top so the 'bit higher' position is visible
         window.scrollTo({ top: 0, behavior: 'instant' });
     }
 }
@@ -211,11 +214,17 @@ function generateFriendFields() {
 
 function downloadPDF() {
     const doc = new jsPDF();
-    const eventInput = document.getElementById('stdEvent').value.trim();
-    const fileName = eventInput ? `${eventInput} DL.pdf` : "Leave_Letter.pdf";
-    const fullText = document.getElementById('fullDraftLetter').value;
+    const textArea = document.getElementById('fullDraftLetter');
+    const fullText = textArea.value;
+    
+    // Check the hidden attribute to determine the correct filename
+    const fileName = textArea.getAttribute('data-filename') || "Formal_Letter.pdf";
+    
+    // Force pure black font
+    doc.setTextColor(0, 0, 0); 
     doc.setFont("courier", "normal");
     doc.setFontSize(11);
+    
     const splitText = doc.splitTextToSize(fullText, 170);
     doc.text(splitText, 20, 20);
     doc.save(fileName);
@@ -225,14 +234,23 @@ function downloadHistoryPDF() {
     const doc = new jsPDF();
     const textArea = document.getElementById('historyFullDraftLetter');
     const eventName = textArea.getAttribute('data-event') || "Leave_Letter";
+    const fullText = textArea.value;
+    
+    // Route filename based on history data
+    const fileName = eventName === "AI Custom Letter" ? "formal_letter.pdf" : `${eventName} DL.pdf`;
+    
+    // Force pure black font
+    doc.setTextColor(0, 0, 0);
     doc.setFont("courier", "normal");
     doc.setFontSize(11);
-    const splitText = doc.splitTextToSize(textArea.value, 170);
+    
+    const splitText = doc.splitTextToSize(fullText, 170);
     doc.text(splitText, 20, 20);
-    doc.save(`${eventName} DL.pdf`);
+    doc.save(fileName);
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+    // Load Standard DL Saved Data
     const savedData = localStorage.getItem('savedUser');
     if (savedData) {
         const data = JSON.parse(savedData);
@@ -241,4 +259,147 @@ window.addEventListener('DOMContentLoaded', () => {
         if(document.getElementById('stdCollege')) document.getElementById('stdCollege').value = data.college || "";
         if(document.getElementById('rememberMe')) document.getElementById('rememberMe').checked = true;
     }
+
+    // Load AI View Saved Data (SENDER ONLY)
+    const savedAIData = localStorage.getItem('savedAIUser');
+    if (savedAIData) {
+        const aiData = JSON.parse(savedAIData);
+        if(document.getElementById('aiFromName')) document.getElementById('aiFromName').value = aiData.name || "";
+        if(document.getElementById('aiFromAddress1')) document.getElementById('aiFromAddress1').value = aiData.add1 || "";
+        if(document.getElementById('aiFromAddress2')) document.getElementById('aiFromAddress2').value = aiData.add2 || "";
+        if(document.getElementById('aiRememberMe')) document.getElementById('aiRememberMe').checked = true;
+    }
+
+    // 'Enter' Key to Submit AI Form with Simulated Button Click
+    const aiPromptInput = document.getElementById('aiPrompt');
+    if (aiPromptInput) {
+        aiPromptInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); 
+                
+                const submitBtn = document.getElementById('aiSubmitBtn');
+                if (submitBtn) {
+                    // 1. Simulate the "pressed" state matching your CSS
+                    submitBtn.style.transform = 'translate(3px, 3px)';
+                    submitBtn.style.boxShadow = '0px 0px 0px transparent';
+                    
+                    // 2. Wait 150ms, revert styles, and trigger the AI
+                    setTimeout(() => {
+                        submitBtn.style.transform = '';
+                        submitBtn.style.boxShadow = '';
+                        draftAI(); 
+                    }, 150);
+                } else {
+                    draftAI(); // Fallback if button isn't found
+                }
+            }
+        });
+    }
 });
+
+async function draftAI() {
+    // Strict Check for API Key
+    if (!API_KEY || API_KEY === 'YOUR_API_KEY_HERE' || API_KEY === 'my api key') {
+        alert("Wait! You need to paste your real Google API key (starts with AIza...) into the top of the script.js file.");
+        return;
+    }
+
+    // Get Raw Sender Inputs BEFORE Fallbacks
+    const rawFromName = document.getElementById('aiFromName').value;
+    const rawFromAdd1 = document.getElementById('aiFromAddress1').value;
+    const rawFromAdd2 = document.getElementById('aiFromAddress2').value;
+
+    // Remember Me Logic (SENDER ONLY)
+    const aiRememberCheckbox = document.getElementById('aiRememberMe');
+    if (aiRememberCheckbox && aiRememberCheckbox.checked) {
+        const aiUserData = { name: rawFromName, add1: rawFromAdd1, add2: rawFromAdd2 };
+        localStorage.setItem('savedAIUser', JSON.stringify(aiUserData));
+    } else {
+        localStorage.removeItem('savedAIUser');
+    }
+
+    // Apply Fallbacks for the AI Prompt
+    const fromName = rawFromName || "[Sender's Name]";
+    const fromAdd1 = rawFromAdd1 || "[Sender Address 1]";
+    const fromAdd2 = rawFromAdd2 || "[Sender Address 2]";
+    const toName = document.getElementById('aiToName').value || "[Recipient Name]";
+    const toAdd1 = document.getElementById('aiToAddress1').value || "[Recipient Address 1]";
+    const toAdd2 = document.getElementById('aiToAddress2').value || "[Recipient Address 2]";
+    const reason = document.getElementById('aiPrompt').value || "[Reason for letter]";
+
+    const now = new Date();
+    const dateStr = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
+
+    const submitBtn = document.getElementById('aiSubmitBtn');
+    const originalBtnText = submitBtn.innerText;
+    submitBtn.innerText = "GENERATING... PLEASE WAIT";
+    submitBtn.style.pointerEvents = "none";
+
+    const promptText = `
+    Write a professional formal letter. 
+    FROM: ${fromName}, ${fromAdd1}, ${fromAdd2}
+    TO: ${toName}, ${toAdd1}, ${toAdd2}
+    DATE: ${dateStr}
+    REASON: ${reason}
+    REQUIREMENTS: 
+    1. Output RAW TEXT ONLY. No Markdown, no asterisks (**), no hashtags.
+    2. At the very end of the letter, under the sign-off (e.g., "Sincerely,"), ONLY output the sender's name (${fromName}) directly on the next line. Do NOT leave a blank line for a signature, and do NOT include the sender's address at the bottom.
+    `;
+
+    try {
+        // API CALL (gemini-2.5-flash)
+        const response = await fetch('/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ promptText: promptText }) // Send the prompt to your middleman
+        });
+
+        const data = await response.json();
+        
+        // Handle Google API specific error messages
+        if (data.error) throw new Error(data.error.message);
+
+        const generatedText = data.candidates[0].content.parts[0].text;
+        
+        // Clean Markdown symbols
+        let cleanLetter = generatedText.replace(/[\*#_]/g, '').trim();
+        
+        // Force the signature name to snap directly under the sign-off (removes empty lines)
+        cleanLetter = cleanLetter.replace(/(Sincerely,|Yours faithfully,|Yours sincerely,|Regards,|Yours truly,)\s*\n+/gi, "$1\n");
+
+        // Update UI 
+        const draftArea = document.getElementById('fullDraftLetter');
+        draftArea.value = cleanLetter;
+        
+        // Hardcode filename for AI view
+        draftArea.setAttribute('data-filename', 'formal_letter.pdf');
+
+        const editingBay = document.getElementById('editingBay');
+        editingBay.classList.remove('hidden');
+        editingBay.scrollIntoView({ behavior: 'smooth' });
+
+        // Save to History (Updated for AI letters)
+saveToHistory({
+    eventName: "AI Custom Letter",
+    recipient: toName, // Add the recipient's name here
+    date: dateStr,
+    friendsCount: null, // Set to null so we can check it later
+    letterText: cleanLetter,
+    generatedAt: new Date().toLocaleString([], { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+});
+
+    } catch (error) {
+        console.error("Gemini API Error:", error);
+        
+        if (error.message.includes("429")) {
+            alert("Rate limit reached. Please wait 60 seconds.");
+        } else if (error.message.includes("API key not valid")) {
+            alert("The API key provided is not valid. Please check that you copied it correctly from Google AI Studio.");
+        } else {
+            alert("Failed to generate: " + error.message);
+        }
+    } finally {
+        submitBtn.innerText = originalBtnText;
+        submitBtn.style.pointerEvents = "auto";
+    }
+}
