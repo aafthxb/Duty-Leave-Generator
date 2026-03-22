@@ -336,10 +336,11 @@ async function draftAI() {
     DATE: ${dateStr}
     REASON: ${reason}
     REQUIREMENTS: 
-    1. Output RAW TEXT ONLY. No Markdown, no asterisks (**), no hashtags.
-    2. SUBJECT LINE: Keep the subject line concise (e.g., "Subject: Request for Medical Leave"). 
-       DO NOT include the sender's name, department, or any other personal details in the subject line.
-    3. At the very end of the letter, under the sign-off, ONLY output the sender's name (${fromName}) directly on the next line.
+    1. Output RAW TEXT ONLY. No Markdown (** or #).
+    2. HEADER SPACING: You MUST include exactly ONE EMPTY LINE between the From Address block, the Date and the To Address block.
+    3. TO ADDRESS SPACING: Include exactly ONE EMPTY LINE between the Date and the To Address block.
+    4. SUBJECT LINE: Keep it concise (e.g., "Subject: Request for Medical Leave"). No personal details in the subject.
+    5. SIGN-OFF: Under the sign-off, ONLY output the sender's name (${fromName}) directly on the next line.
 `;
 
     try {
