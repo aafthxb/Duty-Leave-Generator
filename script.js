@@ -298,18 +298,12 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 async function draftAI() {
-    // Strict Check for API Key
-    if (!API_KEY || API_KEY === 'YOUR_API_KEY_HERE' || API_KEY === 'my api key') {
-        alert("Wait! You need to paste your real Google API key (starts with AIza...) into the top of the script.js file.");
-        return;
-    }
-
-    // Get Raw Sender Inputs BEFORE Fallbacks
+    // Get Raw Sender Inputs
     const rawFromName = document.getElementById('aiFromName').value;
     const rawFromAdd1 = document.getElementById('aiFromAddress1').value;
     const rawFromAdd2 = document.getElementById('aiFromAddress2').value;
 
-    // Remember Me Logic (SENDER ONLY)
+    // Remember Me Logic
     const aiRememberCheckbox = document.getElementById('aiRememberMe');
     if (aiRememberCheckbox && aiRememberCheckbox.checked) {
         const aiUserData = { name: rawFromName, add1: rawFromAdd1, add2: rawFromAdd2 };
@@ -318,7 +312,7 @@ async function draftAI() {
         localStorage.removeItem('savedAIUser');
     }
 
-    // Apply Fallbacks for the AI Prompt
+    // Apply Fallbacks
     const fromName = rawFromName || "[Sender's Name]";
     const fromAdd1 = rawFromAdd1 || "[Sender Address 1]";
     const fromAdd2 = rawFromAdd2 || "[Sender Address 2]";
@@ -343,61 +337,46 @@ async function draftAI() {
     REASON: ${reason}
     REQUIREMENTS: 
     1. Output RAW TEXT ONLY. No Markdown, no asterisks (**), no hashtags.
-    2. At the very end of the letter, under the sign-off (e.g., "Sincerely,"), ONLY output the sender's name (${fromName}) directly on the next line. Do NOT leave a blank line for a signature, and do NOT include the sender's address at the bottom.
+    2. Under the sign-off, ONLY output the sender's name (${fromName}) directly on the next line.
     `;
 
     try {
-        // API CALL (gemini-2.5-flash)
+        // CALL YOUR VERCEL API INSTEAD OF GOOGLE DIRECTLY
         const response = await fetch('/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ promptText: promptText }) // Send the prompt to your middleman
+            body: JSON.stringify({ promptText: promptText })
         });
 
         const data = await response.json();
         
-        // Handle Google API specific error messages
-        if (data.error) throw new Error(data.error.message);
+        if (data.error) throw new Error(data.error);
 
         const generatedText = data.candidates[0].content.parts[0].text;
-        
-        // Clean Markdown symbols
         let cleanLetter = generatedText.replace(/[\*#_]/g, '').trim();
-        
-        // Force the signature name to snap directly under the sign-off (removes empty lines)
         cleanLetter = cleanLetter.replace(/(Sincerely,|Yours faithfully,|Yours sincerely,|Regards,|Yours truly,)\s*\n+/gi, "$1\n");
 
-        // Update UI 
+        // Update UI
         const draftArea = document.getElementById('fullDraftLetter');
         draftArea.value = cleanLetter;
-        
-        // Hardcode filename for AI view
         draftArea.setAttribute('data-filename', 'formal_letter.pdf');
 
         const editingBay = document.getElementById('editingBay');
         editingBay.classList.remove('hidden');
         editingBay.scrollIntoView({ behavior: 'smooth' });
 
-        // Save to History (Updated for AI letters)
-saveToHistory({
-    eventName: "AI Custom Letter",
-    recipient: toName, // Add the recipient's name here
-    date: dateStr,
-    friendsCount: null, // Set to null so we can check it later
-    letterText: cleanLetter,
-    generatedAt: new Date().toLocaleString([], { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-});
+        saveToHistory({
+            eventName: "AI Custom Letter",
+            recipient: toName,
+            date: dateStr,
+            friendsCount: null,
+            letterText: cleanLetter,
+            generatedAt: new Date().toLocaleString([], { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+        });
 
     } catch (error) {
-        console.error("Gemini API Error:", error);
-        
-        if (error.message.includes("429")) {
-            alert("Rate limit reached. Please wait 60 seconds.");
-        } else if (error.message.includes("API key not valid")) {
-            alert("The API key provided is not valid. Please check that you copied it correctly from Google AI Studio.");
-        } else {
-            alert("Failed to generate: " + error.message);
-        }
+        console.error("API Error:", error);
+        alert("Error: " + error.message);
     } finally {
         submitBtn.innerText = originalBtnText;
         submitBtn.style.pointerEvents = "auto";
