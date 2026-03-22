@@ -63,13 +63,10 @@
                 padding: 1.2rem; 
                 transform: translateY(-5vh);
             }
-
-            /* Nudges the card a teeny bit above center for History & Edit views */
             .card:has(#historyView:not(.hidden)),
             .card:has(#historyDetailView:not(.hidden)) {
                 transform: translateY(-3vh);
             }
-
             h2 { font-size: 1.3rem; }
             .grid { gap: 0.8rem; }
         }
@@ -81,7 +78,6 @@
             margin-top: 1.5rem; 
         }
         
-        /* ORIGINAL OPTION CARD STYLES (Kept for History View) */
         .option-card { 
             border: 2px solid #ffffff; 
             padding: 1.2rem; 
@@ -100,7 +96,6 @@
             box-shadow: 0px 0px 0px #ffffff;
         }
 
-        /* NEW STYLES SPECIFICALLY FOR THE HOME PAGE CARDS ONLY */
         .home-card {
             padding: 1.5rem 1.2rem; 
             display: flex;
@@ -110,9 +105,13 @@
             text-align: center;
         }
 
+        /* --- COLORFUL ICONS --- */
+        .icon-doc { color: #0066ff; }
+        .icon-spark { color: #ffcc00; }
+        .icon-history { color: #a0aec0; }
+
         .home-card .card-icon {
             margin-bottom: 0.2rem;
-            color: #ffffff;
         }
 
         .home-card h3 { 
@@ -131,7 +130,6 @@
             font-weight: normal; 
             text-transform: lowercase; 
         }
-        /* END NEW HOME CARD STYLES */
         
         .form-group { margin-bottom: 1.2rem; }
         
@@ -234,13 +232,9 @@
 
         .coming-soon-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
             z-index: 100;
             background: rgba(0,0,0,0.4);
         }
@@ -254,16 +248,8 @@
             max-width: 80%;
         }
 
-        .popup-box h2 {
-            color: #fff;
-            margin-bottom: 0.5rem;
-        }
-
-        .popup-box p {
-            color: #aaa;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-        }
+        .popup-box h2 { color: #fff; margin-bottom: 0.5rem; }
+        .popup-box p { color: #aaa; margin-bottom: 1.5rem; font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -273,8 +259,8 @@
         <h2>Draft your Formal Letters with Simple Clicks!</h2>
         <div class="grid">
             <div class="option-card home-card" onclick="delayedNavigate('standardView')">
-                <div class="card-icon">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter">
+                <div class="card-icon icon-doc">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                         <polyline points="14 2 14 8 20 8"></polyline>
                         <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -287,19 +273,19 @@
             </div>
             
             <div class="option-card home-card" onclick="delayedNavigate('aiView')">
-                <div class="card-icon">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter">
+                <div class="card-icon icon-spark">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter">
                         <path d="M10 2l2.5 6.5L19 11l-6.5 2.5L10 20l-2.5-6.5L1 11l6.5-2.5L10 2z"></path>
                         <path d="M20 3l1 2.5L23.5 6.5l-2.5 1L20 10l-1-2.5L16.5 6.5l2.5-1L20 3z"></path>
                     </svg>
                 </div>
                 <h3>CUSTOM AI LETTER</h3>
-                <p>Describe your situation, and the AI will write a formal request for your college reasons.</p>
+                <p>Describe your situation, and the AI will write a formal request.</p>
             </div>
             
             <div class="option-card home-card" onclick="delayedNavigate('historyView'); loadHistory();">
-                <div class="card-icon">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter">
+                <div class="card-icon icon-history">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter">
                         <circle cx="12" cy="12" r="10"></circle>
                         <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
@@ -317,11 +303,9 @@
             <label>Full Name</label>
             <input type="text" id="stdName" placeholder="E.G., JANE DOE">
         </div>
-        <div class="grid" style="margin-top: 0; margin-bottom: 1.2rem;">
-            <div class="form-group" style="margin-bottom: 0;">
-                <label>DEPT / CLASS</label>
-                <input type="text" id="stdDepartment" placeholder="2ND YEAR BCA">
-            </div>
+        <div class="form-group">
+            <label>DEPT / CLASS</label>
+            <input type="text" id="stdDepartment" placeholder="2ND YEAR BCA">
         </div>
         <div class="form-group">
             <label>College Name</label>
@@ -361,11 +345,9 @@
             </div>
         </div>
 
-        <div class="grid" style="margin-top: 0; margin-bottom: 1.2rem;">
-            <div class="form-group" style="margin-bottom: 0;">
-                <label>Friends Count (0-15)</label>
-                <input type="number" id="numFriends" min="0" max="15" placeholder="0" oninput="generateFriendFields()">
-            </div>
+        <div class="form-group">
+            <label>Friends Count (0-15)</label>
+            <input type="number" id="numFriends" min="0" max="15" placeholder="0" oninput="generateFriendFields()">
         </div>
         <div id="friendsContainer"></div>
         <button class="btn btn-black" onclick="draftStandard()">GENERATE DRAFT</button>
@@ -385,33 +367,29 @@
             <h2>AI CUSTOM LETTER</h2>
             <div class="form-group">
                 <label>Full Name</label>
-                <input type="text" id="aiName" placeholder="E.G., JANE DOE" tabindex="-1">
+                <input type="text" id="aiName" placeholder="E.G., JANE DOE">
             </div>
             <div class="grid" style="margin-top: 0; margin-bottom: 1.2rem;">
-                <div class="form-group" style="margin-bottom: 0;">
+                <div class="form-group">
                     <label>DEPT / CLASS</label>
-                    <input type="text" id="aiDept" placeholder="2ND YEAR BCA" tabindex="-1">
+                    <input type="text" id="aiDept" placeholder="2ND YEAR BCA">
                 </div>
-                <div class="form-group" style="margin-bottom: 0;">
+                <div class="form-group">
                     <label>DATE</label>
-                    <input type="date" id="aiDate" tabindex="-1">
+                    <input type="date" id="aiDate">
                 </div>
             </div>
             <div class="form-group">
                 <label>College Name</label>
-                <input type="text" id="aiCollege" placeholder="COLLEGE NAME" tabindex="-1">
+                <input type="text" id="aiCollege" placeholder="COLLEGE NAME">
             </div>
             <hr>
             <div class="form-group">
                 <label>What happened?</label>
-                <textarea id="aiPrompt" placeholder="DESCRIBE THE REASON..." tabindex="-1"></textarea>
-            </div>
-            <div class="form-group">
-                <label>Friends Count (0-15)</label>
-                <input type="number" id="numFriendsAI" min="0" max="15" placeholder="0" oninput="generateFriendFieldsAI()" tabindex="-1">
+                <textarea id="aiPrompt" placeholder="DESCRIBE THE REASON..."></textarea>
             </div>
             <div id="friendsContainerAI"></div>
-            <button class="btn btn-black" onclick="draftWithAI()" tabindex="-1">ASK AI TO DRAFT</button>
+            <button class="btn btn-black">ASK AI TO DRAFT</button>
         </div>
     </div>
 
@@ -419,7 +397,7 @@
         <button class="btn btn-outline" onclick="delayedNavigate('homeView')">← START OVER</button>
         <h2>REVIEW LETTER</h2>
         <p style="font-size: 0.85rem; color: #888; margin-bottom: 1rem;">
-            You can manually adjust the text below before saving it as a PDF.
+            Adjust text below before saving as PDF.
         </p>
         <div class="form-group">
             <textarea id="fullDraftLetter" style="min-height: 400px; font-family: monospace; white-space: pre-wrap; line-height: 1.5; font-size: 0.9rem;"></textarea>
@@ -429,7 +407,7 @@
 
     <div id="historyView" class="hidden">
         <div style="display: flex; gap: 10px; margin-bottom: 1.5rem;">
-            <button class="btn btn-outline" style="margin-bottom: 0;" onclick="delayedNavigate('homeView')">← BACK TO HOME</button>
+            <button class="btn btn-outline" style="margin-bottom: 0;" onclick="delayedNavigate('homeView')">← BACK</button>
             <button class="btn btn-red" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 0;" onclick="clearHistory()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z" fill="#ffffff"/>
@@ -439,14 +417,12 @@
             </button>
         </div>
         <h2>DRAFT HISTORY</h2>
-        <div id="historyListContainer" class="grid" style="grid-template-columns: 1fr; margin-top: 0;">
-        </div>
+        <div id="historyListContainer" class="grid" style="grid-template-columns: 1fr; margin-top: 0;"></div>
     </div>
 
     <div id="historyDetailView" class="hidden">
         <div style="display: flex; gap: 10px; margin-bottom: 1.5rem;">
             <button class="btn btn-outline" style="margin-bottom: 0;" onclick="delayedNavigate('historyView')">← BACK</button>
-            <button class="btn btn-outline" style="margin-bottom: 0;" onclick="delayedNavigate('homeView')">← START OVER</button>
         </div>
         <h2>EDIT PAST DRAFT</h2>
         <div class="form-group">
@@ -461,6 +437,10 @@
         setTimeout(() => {
             if (typeof navigate === "function") {
                 navigate(viewId);
+            } else {
+                // Fallback if script.js isn't loaded yet
+                document.querySelectorAll('.card > div').forEach(div => div.classList.add('hidden'));
+                document.getElementById(viewId).classList.remove('hidden');
             }
         }, 150); 
     }
