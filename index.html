@@ -47,7 +47,7 @@
             margin: auto;
             transform: translateY(-8vh); 
             transition: transform 0.3s ease;
-            position: relative; /* Required for the popup positioning */
+            position: relative;
         }
 
         .card:has(#standardView:not(.hidden)),
@@ -59,20 +59,31 @@
         }
 
         @media (max-width: 480px) {
-    .card { 
-        padding: 1.2rem; 
-        transform: translateY(-5vh); /* Default for Home/Standard */
-    }
+            .card { 
+                padding: 1.2rem; 
+                transform: translateY(-5vh);
+            }
 
-    /* Subtly nudge History and Edit Detail higher than the rest */
-    .card:has(#historyView:not(.hidden)),
-    .card:has(#historyDetailView:not(.hidden)) {
-        transform: translateY(-8vh);
-    }
+            .card:has(#historyView:not(.hidden)),
+            .card:has(#historyDetailView:not(.hidden)) {
+                transform: translateY(-8vh);
+            }
 
-    h2 { font-size: 1.3rem; }
-    .grid { gap: 0.8rem; }
-}
+            h2 { font-size: 1.3rem; }
+            .grid { gap: 0.8rem; }
+
+            /* Centers the card position in the history list without centering the text */
+            #historyListContainer {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+            #historyListContainer .option-card {
+                width: 100%;
+                max-width: 400px;
+            }
+        }
         
         .grid { 
             display: grid; 
@@ -192,7 +203,6 @@
             padding-left: 0.8rem;
         }
 
-        /* --- AI VIEW SPECIAL STYLES --- */
         .blur-effect {
             filter: blur(5px);
             pointer-events: none;
@@ -209,7 +219,7 @@
             justify-content: center;
             align-items: center;
             z-index: 100;
-            background: rgba(0,0,0,0.4); /* Slight dimming */
+            background: rgba(0,0,0,0.4);
         }
 
         .popup-box {
@@ -234,7 +244,6 @@
     </style>
 </head>
 <body>
-
 
 <div class="card">
     <div id="homeView">
@@ -267,54 +276,51 @@
                 <label>DEPT / CLASS</label>
                 <input type="text" id="stdDepartment" placeholder="2ND YEAR BCA">
             </div>
-            
         </div>
         <div class="form-group">
-    <label>College Name</label>
-    <input type="text" id="stdCollege" placeholder="COLLEGE NAME">
-</div>
+            <label>College Name</label>
+            <input type="text" id="stdCollege" placeholder="COLLEGE NAME">
+        </div>
 
-<div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: -5px;">
-    <input type="checkbox" id="rememberMe" style="width: 18px; height: 18px; cursor: pointer;">
-    <label style="margin-bottom: 0; cursor: pointer;" for="rememberMe">Remember My Details</label>
-</div>
+        <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: -5px;">
+            <input type="checkbox" id="rememberMe" style="width: 18px; height: 18px; cursor: pointer;">
+            <label style="margin-bottom: 0; cursor: pointer;" for="rememberMe">Remember My Details</label>
+        </div>
 
-<hr>
+        <hr>
 
-<div class="form-group">
-    <label>Event Name</label>
-    <input type="text" id="stdEvent" placeholder="E.G., NEXORA IDEATHON">
-</div>
+        <div class="form-group">
+            <label>Event Name</label>
+            <input type="text" id="stdEvent" placeholder="E.G., NEXORA IDEATHON">
+        </div>
 
-<div class="form-group">
-    <label>Location</label>
-    <input type="text" id="stdLocation" placeholder="INSTITUTION / CITY">
-</div>
+        <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="stdLocation" placeholder="INSTITUTION / CITY">
+        </div>
 
-<div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
-    <input type="checkbox" id="isMultiDay" style="width: 18px; height: 18px; cursor: pointer;" onchange="toggleDateRange()">
-    <label style="margin-bottom: 0; cursor: pointer;" for="isMultiDay">Multi-day Event</label>
-</div>
+        <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
+            <input type="checkbox" id="isMultiDay" style="width: 18px; height: 18px; cursor: pointer;" onchange="toggleDateRange()">
+            <label style="margin-bottom: 0; cursor: pointer;" for="isMultiDay">Multi-day Event</label>
+        </div>
 
-<div class="grid" style="margin-top: 0; margin-bottom: 1.2rem;">
-    <div class="form-group" style="margin-bottom: 0;">
-        <label id="dateLabel">DATE OF THE EVENT</label>
-        <input type="date" id="stdDateTime">
-    </div>
-    <div id="endDateGroup" class="form-group hidden" style="margin-bottom: 0;">
-        <label>TO DATE</label>
-        <input type="date" id="stdEndDateTime">
-    </div>
-</div>
+        <div class="grid" style="margin-top: 0; margin-bottom: 1.2rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label id="dateLabel">DATE OF THE EVENT</label>
+                <input type="date" id="stdDateTime">
+            </div>
+            <div id="endDateGroup" class="form-group hidden" style="margin-bottom: 0;">
+                <label>TO DATE</label>
+                <input type="date" id="stdEndDateTime">
+            </div>
+        </div>
 
-<div class="grid" style="margin-top: 0; margin-bottom: 1.2rem;">
-    
-    <div class="form-group" style="margin-bottom: 0;">
-        <label>Friends Count (0-15)</label>
-        <input type="number" id="numFriends" min="0" max="15" placeholder="0" oninput="generateFriendFields()">
-    </div>
-    
-</div>
+        <div class="grid" style="margin-top: 0; margin-bottom: 1.2rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label>Friends Count (0-15)</label>
+                <input type="number" id="numFriends" min="0" max="15" placeholder="0" oninput="generateFriendFields()">
+            </div>
+        </div>
         <div id="friendsContainer"></div>
         <button class="btn btn-black" onclick="draftStandard()">GENERATE DRAFT</button>
     </div>
@@ -331,7 +337,6 @@
         <div class="blur-effect">
             <button class="btn btn-outline" onclick="delayedNavigate('homeView')">← BACK TO HOME</button>
             <h2>AI CUSTOM LETTER</h2>
-            
             <div class="form-group">
                 <label>Full Name</label>
                 <input type="text" id="aiName" placeholder="E.G., JANE DOE" tabindex="-1">
@@ -350,20 +355,16 @@
                 <label>College Name</label>
                 <input type="text" id="aiCollege" placeholder="COLLEGE NAME" tabindex="-1">
             </div>
-
             <hr>
-
             <div class="form-group">
                 <label>What happened?</label>
                 <textarea id="aiPrompt" placeholder="DESCRIBE THE REASON..." tabindex="-1"></textarea>
             </div>
-
             <div class="form-group">
                 <label>Friends Count (0-15)</label>
                 <input type="number" id="numFriendsAI" min="0" max="15" placeholder="0" oninput="generateFriendFieldsAI()" tabindex="-1">
             </div>
             <div id="friendsContainerAI"></div>
-
             <button class="btn btn-black" onclick="draftWithAI()" tabindex="-1">ASK AI TO DRAFT</button>
         </div>
     </div>
@@ -379,20 +380,21 @@
         </div>
         <button class="btn btn-blue" onclick="downloadPDF()">DOWNLOAD OFFICIAL PDF</button>
     </div>
+
     <div id="historyView" class="hidden">
         <div style="display: flex; gap: 10px; margin-bottom: 1.5rem;">
             <button class="btn btn-outline" style="margin-bottom: 0;" onclick="delayedNavigate('homeView')">← BACK TO HOME</button>
             <button class="btn btn-red" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 0;" onclick="clearHistory()">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z" fill="#ffffff"/>
-        <path d="M6 7V19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6ZM10 18H8V9H10V18ZM13 18H11V9H13V18ZM16 18H14V9H16V18Z" fill="#ffffff"/>
-    </svg>
-    CLEAR
-</button>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z" fill="#ffffff"/>
+                    <path d="M6 7V19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6ZM10 18H8V9H10V18ZM13 18H11V9H13V18ZM16 18H14V9H16V18Z" fill="#ffffff"/>
+                </svg>
+                CLEAR
+            </button>
         </div>
         <h2>DRAFT HISTORY</h2>
         <div id="historyListContainer" class="grid" style="grid-template-columns: 1fr; margin-top: 0;">
-            </div>
+        </div>
     </div>
 
     <div id="historyDetailView" class="hidden">
