@@ -58,15 +58,21 @@
             transform: translateY(0);
         }
 
-        @media (max-width: 480px) {
-            .card { 
-                padding: 1.2rem; 
-                transform: translateY(-5vh);
-                
-            }
-            h2 { font-size: 1.3rem; }
-            .grid { gap: 0.8rem; }
-        }
+       @media (max-width: 480px) {
+    .card { 
+        padding: 1.2rem; 
+        transform: translateY(-5vh); /* Default for Home/Standard */
+    }
+
+    /* Subtly nudge History and Edit Detail higher than the rest */
+    .card:has(#historyView:not(.hidden)),
+    .card:has(#historyDetailView:not(.hidden)) {
+        transform: translateY(-8vh);
+    }
+
+    h2 { font-size: 1.3rem; }
+    .grid { gap: 0.8rem; }
+}
         
         .grid { 
             display: grid; 
