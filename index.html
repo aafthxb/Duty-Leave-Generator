@@ -64,10 +64,10 @@
                 transform: translateY(-5vh);
             }
 
-            /* Centers the card perfectly vertically by resetting the upward nudge */
+            /* Nudges the card a teeny bit above center for History & Edit views */
             .card:has(#historyView:not(.hidden)),
             .card:has(#historyDetailView:not(.hidden)) {
-                transform: translateY(0);
+                transform: translateY(-3vh);
             }
 
             h2 { font-size: 1.3rem; }
