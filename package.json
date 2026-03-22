@@ -1,0 +1,17 @@
+{
+  "name": "formal-letter-generator",
+  "version": "1.0.0",
+  "description": "The ultimate formal letter drafter with AI-powered requests and instant PDF downloads",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static HTML project - no build needed'",
+    "lint": "echo 'No linter configured'"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^1.4.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
