@@ -1,8 +1,5 @@
 const { jsPDF } = window.jspdf;
 
-// 1. Paste your actual free Gemini API Key here (It should look like 'AIzaSy...')
-const API_KEY = 'you should paste your real API key here, starting with AIza...'; 
-
 // Simple Router to switch between views
 function navigate(viewId) {
     const views = ['homeView', 'standardView', 'aiView', 'editingBay', 'historyView', 'historyDetailView'];
