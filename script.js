@@ -12,9 +12,10 @@ function navigate(viewId) {
     document.getElementById('standardView').classList.add('hidden');
     document.getElementById('aiView').classList.add('hidden');
     document.getElementById('editingBay').classList.add('hidden');
+    document.getElementById('historyView').classList.add('hidden');
+    document.getElementById('historyDetailView').classList.add('hidden');
     
     document.getElementById(viewId).classList.remove('hidden');
-
 }
 
 // Generates the standard event draft
@@ -100,6 +101,15 @@ Yours faithfully,
 ${signatureBlock}`;
 
     document.getElementById('fullDraftLetter').value = fullLetter;
+    // Save to History
+    const histEvent = eventName !== "[Event Name]" ? eventName : "Standard Request";
+    const histDate = rawDate ? dateTime : "N/A";
+    saveToHistory({
+        eventName: histEvent,
+        date: histDate,
+        friendsCount: friendsArray.length,
+        letterText: fullLetter
+    });
     document.getElementById('editingBay').classList.remove('hidden');
     document.getElementById('editingBay').scrollIntoView({ behavior: 'smooth' });
 }
@@ -148,6 +158,16 @@ Yours faithfully,
 ${nameInfo}`;
 
         fullDraftArea.value = fullLetter;
+        // Save to History
+        const promptTextForHist = promptText ? (promptText.substring(0, 15) + "...") : "AI Request";
+        const histDateAi = document.getElementById('aiDate').value || today;
+        const aiFriends = document.getElementById('numFriendsAI').value || "0";
+        saveToHistory({
+            eventName: promptTextForHist,
+            date: histDateAi,
+            friendsCount: aiFriends,
+            letterText: fullLetter
+        });
     } catch (error) {
         fullDraftArea.value = "Error connecting to AI. Please check your API key or internet connection.";
         console.error(error);
@@ -248,3 +268,94 @@ window.addEventListener('DOMContentLoaded', () => {
         if(document.getElementById('rememberMe')) document.getElementById('rememberMe').checked = true;
     }
 });
+
+// --- NEW HISTORY LOGIC ---
+
+// Helper function to save a draft to local storage
+function saveToHistory(entryData) {
+    let history = JSON.parse(localStorage.getItem('letterHistory') || '[]');
+    history.unshift(entryData); // Add to the beginning of the array
+    if (history.length > 5) {
+        history = history.slice(0, 5); // Enforce the 5-item limit
+    }
+    localStorage.setItem('letterHistory', JSON.stringify(history));
+}
+
+// Loads the history buttons into the History View
+function loadHistory() {
+    const history = JSON.parse(localStorage.getItem('letterHistory') || '[]');
+    const container = document.getElementById('historyListContainer');
+    container.innerHTML = ''; 
+
+    if (history.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #888; margin-top: 2rem;">No history found. Draft a letter first!</p>';
+        return;
+    }
+
+    history.forEach((item, index) => {
+        const div = document.createElement('div');
+        // Reusing option-card for that clicky feel
+        div.className = 'option-card'; 
+        div.style.textAlign = 'left';
+        div.style.display = 'flex';
+        div.style.flexDirection = 'column';
+        div.style.gap = '5px';
+        div.onclick = () => openHistoryDetail(index);
+        
+        div.innerHTML = `
+            <div style="font-size: 1.1rem; font-weight: 900; text-transform: uppercase; color: #ffffff;">${item.eventName}</div>
+            <div style="font-size: 0.8rem; color: #aaa; font-weight: normal; text-transform: none;">
+                Date: ${item.date} &nbsp;|&nbsp; Friends: ${item.friendsCount}
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+// Opens the detail page for a specific history item
+function openHistoryDetail(index) {
+    const history = JSON.parse(localStorage.getItem('letterHistory') || '[]');
+    const item = history[index];
+    
+    if (item) {
+        document.getElementById('historyFullDraftLetter').value = item.letterText;
+        // Stash the event name so the PDF download names the file correctly
+        document.getElementById('historyFullDraftLetter').setAttribute('data-event', item.eventName); 
+        delayedNavigate('historyDetailView');
+    }
+}
+
+// Download PDF function specific to the History View
+function downloadHistoryPDF() {
+    const doc = new jsPDF();
+    const margin = 20;
+    
+    const textArea = document.getElementById('historyFullDraftLetter');
+    const fullText = textArea.value;
+    const eventInput = textArea.getAttribute('data-event') || "Leave_Letter";
+    const fileName = `${eventInput} DL.pdf`;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    
+    const splitText = doc.splitTextToSize(fullText, 170);
+    doc.text(splitText, margin, 20);
+
+    doc.save(fileName);
+}
+
+// Clears all saved history entries from local storage
+function clearHistory() {
+    const history = JSON.parse(localStorage.getItem('letterHistory') || '[]');
+    
+    if (history.length === 0) {
+        alert("Your history is already empty.");
+        return;
+    }
+
+    // Ask for confirmation before deleting
+    if (confirm("Are you sure you want to clear your draft history? This cannot be undone.")) {
+        localStorage.removeItem('letterHistory');
+        loadHistory(); // Instantly refreshes the view to show the empty state
+    }
+}
