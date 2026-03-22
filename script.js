@@ -3,90 +3,88 @@ const { jsPDF } = window.jspdf;
 // Paste your free Gemini API Key here
 const API_KEY = 'YOUR_API_KEY_HERE'; 
 
-// Global variable to store the user's name for the PDF signature
-let currentUserInfo = "";
-
 // Simple Router to switch between views
 function navigate(viewId) {
-    document.getElementById('homeView').classList.add('hidden');
-    document.getElementById('standardView').classList.add('hidden');
-    document.getElementById('aiView').classList.add('hidden');
-    document.getElementById('editingBay').classList.add('hidden');
-    document.getElementById('historyView').classList.add('hidden');
-    document.getElementById('historyDetailView').classList.add('hidden');
+    const views = ['homeView', 'standardView', 'aiView', 'editingBay', 'historyView', 'historyDetailView'];
+    views.forEach(v => {
+        const el = document.getElementById(v);
+        if(el) el.classList.add('hidden');
+    });
     
-    document.getElementById(viewId).classList.remove('hidden');
+    const target = document.getElementById(viewId);
+    if(target) target.classList.remove('hidden');
+}
+
+// Keeping the delay at 150ms as requested
+function delayedNavigate(viewId) {
+    setTimeout(() => {
+        navigate(viewId);
+    }, 150); 
 }
 
 // Generates the standard event draft
 function draftStandard() {
-    // Inside draftStandard()
-const rememberCheckbox = document.getElementById('rememberMe').checked;
-
-if (rememberCheckbox) {
-    const userData = {
-        name: document.getElementById('stdName').value,
-        dept: document.getElementById('stdDepartment').value,
-        college: document.getElementById('stdCollege').value
-    };
-    localStorage.setItem('savedUser', JSON.stringify(userData));
-} else {
-    localStorage.removeItem('savedUser');
-}
-    const now = new Date();
-    const CURRENT_DATE = String(now.getDate()).padStart(2, '0');
-    const CURRENT_MONTH = String(now.getMonth() + 1).padStart(2, '0');
-    const CURRENT_YEAR = now.getFullYear();
-    
+    // 1. Gather User Details
     const name = document.getElementById('stdName').value || "[Your Name]";
     const department = document.getElementById('stdDepartment').value || "[Your Department]";
     const college = document.getElementById('stdCollege').value || "[Your College Name]";
-    
     const eventName = document.getElementById('stdEvent').value || "[Event Name]";
     const eventLocation = document.getElementById('stdLocation').value || "[Event Location]";
-    const rawDate = document.getElementById('stdDateTime').value;
-    let dateTime = "[Date]";
     
-    if (rawDate) {
-        // Split by the dash from the input
-        const [year, month, day] = rawDate.split('-');
-        // Reassemble with dashes for the final DD-MM-YYYY format
-        dateTime = `${day}-${month}-${year}`;
+    // 2. Remember Me Logic
+    const rememberCheckbox = document.getElementById('rememberMe').checked;
+    if (rememberCheckbox) {
+        const userData = { name, dept: department, college };
+        localStorage.setItem('savedUser', JSON.stringify(userData));
+    } else {
+        localStorage.removeItem('savedUser');
     }
 
-    // Gather all the dynamically generated friend names
+    // 3. Date & Multi-day Logic
+    const isMulti = document.getElementById('isMultiDay').checked;
+    const rawDate = document.getElementById('stdDateTime').value;
+    const rawEndDate = document.getElementById('stdEndDateTime').value;
+    
+    let dateString = "[Date]";
+    let histDateDisplay = "N/A";
+
+    if (rawDate) {
+        const startDate = rawDate.split('-').reverse().join('-');
+        if (isMulti && rawEndDate) {
+            const endDate = rawEndDate.split('-').reverse().join('-');
+            dateString = `from ${startDate} to ${endDate}`;
+            histDateDisplay = `${startDate} - ${endDate}`;
+        } else {
+            dateString = `on ${startDate}`;
+            histDateDisplay = startDate;
+        }
+    }
+
+    // 4. Current Date for Header
+    const now = new Date();
+    const todayStr = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
+
+    // 5. Friends Logic
     const friendInputs = document.querySelectorAll('.friend-name');
     let friendsArray = [];
     friendInputs.forEach(input => {
-        if(input.value.trim() !== '') {
-            friendsArray.push(input.value.trim()); 
-        }
+        if(input.value.trim() !== '') friendsArray.push(input.value.trim()); 
     });
 
-    // NEW: Combine your name with the friends array and stack them vertically
     const allNamesArray = [name, ...friendsArray];
-    const signatureBlock = allNamesArray.join('\n'); // The \n forces them onto new lines
+    const signatureBlock = allNamesArray.join('\n');
 
-    let bodyText = "";
-    
-    // NEW: Clean "I vs We" grammar check
-    // NEW: Clean "I vs We" grammar check (Past Tense version)
-    if (friendsArray.length > 0) {
-        // Group format
-        bodyText = `We are writing to formally request Duty Leave (DL) / Attendance for our absence on ${dateTime}. We participated in the ${eventName} held at ${eventLocation}.\n\nAttending this event provided us with valuable practical exposure. We will ensure that any coursework missed during this period is completed promptly.`;
-    } else {
-        // Solo format
-        bodyText = `I am writing to formally request Duty Leave (DL) / Attendance for my absence on ${dateTime}. I participated in the ${eventName} held at ${eventLocation}.\n\nAttending this event provided valuable practical exposure. I will ensure that any coursework missed during this period is completed promptly.`;
-    }
+    // 6. Body Construction
+    let bodyText = friendsArray.length > 0 
+        ? `We are writing to formally request Duty Leave (DL) / Attendance for our absence ${dateString}. We participated in the ${eventName} held at ${eventLocation}.\n\nAttending this event provided us with valuable practical exposure. We will ensure that any coursework missed during this period is completed promptly.`
+        : `I am writing to formally request Duty Leave (DL) / Attendance for my absence ${dateString}. I participated in the ${eventName} held at ${eventLocation}.\n\nAttending this event provided me with valuable practical exposure. I will ensure that any coursework missed during this period is completed promptly.`;
 
-    const fullLetter = 
-
-`To,
+    const fullLetter = `To,
 The Class Tutor,
 ${department},
 ${college}
 
-Date: ${CURRENT_DATE}-${CURRENT_MONTH}-${CURRENT_YEAR}
+Date: ${todayStr}
 
 Subject: Request for On-Duty (OD) Leave
 
@@ -100,262 +98,136 @@ Yours faithfully,
 
 ${signatureBlock}`;
 
+    // 7. DISPLAY RESULT BELOW (Scrolling behavior)
+    const editingBay = document.getElementById('editingBay');
     document.getElementById('fullDraftLetter').value = fullLetter;
-    // Save to History
-    const histEvent = eventName !== "[Event Name]" ? eventName : "Standard Request";
-    const histDate = rawDate ? dateTime : "N/A";
+    
+    // Reveal the editing bay WITHOUT hiding the form
+    editingBay.classList.remove('hidden');
+    
+    // Smooth scroll down to the result
+    editingBay.scrollIntoView({ behavior: 'smooth' });
+
+    // 8. Save to History
     saveToHistory({
-        eventName: histEvent,
-        date: histDate,
+        eventName: eventName !== "[Event Name]" ? eventName : "Standard Request",
+        date: histDateDisplay,
         friendsCount: friendsArray.length,
         letterText: fullLetter
     });
-    document.getElementById('editingBay').classList.remove('hidden');
-    document.getElementById('editingBay').scrollIntoView({ behavior: 'smooth' });
 }
 
-// Generates the custom AI draft
-async function draftWithAI() {
-    const nameInfo = document.getElementById('aiName').value || "[Your Name, Department]";
-    const promptText = document.getElementById('aiPrompt').value;
-    const fullDraftArea = document.getElementById('fullDraftLetter');
-    const today = new Date().toLocaleDateString();
+// Toggle logic for the multi-day UI
+function toggleDateRange() {
+    const isMulti = document.getElementById('isMultiDay').checked;
+    const endGroup = document.getElementById('endDateGroup');
+    const dateLabel = document.getElementById('dateLabel');
     
-    document.getElementById('editingBay').classList.remove('hidden');
-    fullDraftArea.value = "AI is drafting your letter... Please wait.";
-
-    const prompt = `Write a formal, one-paragraph body for a college leave letter based on this reason: "${promptText}". 
-                    Do not include the To/From addresses, date, or subject line. Just the formal body paragraph starting with "I am writing to...". Tone should be respectful and academic.`;
-
-    try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-        });
-        
-        const data = await response.json();
-        const aiBodyText = data.candidates[0].content.parts[0].text.replace(/\*/g, '').trim();
-
-        // Assemble the complete letter format with the AI body
-        const fullLetter = `Date: ${today}
-
-To,
-The Class Tutor,
-[Your Department],
-[Your College Name]
-
-Subject: Request for Leave of Absence
-
-Respected Sir/Madam,
-
-${aiBodyText}
-
-Thank you for your time and consideration.
-
-Yours faithfully,
-
-${nameInfo}`;
-
-        fullDraftArea.value = fullLetter;
-        // Save to History
-        const promptTextForHist = promptText ? (promptText.substring(0, 15) + "...") : "AI Request";
-        const histDateAi = document.getElementById('aiDate').value || today;
-        const aiFriends = document.getElementById('numFriendsAI').value || "0";
-        saveToHistory({
-            eventName: promptTextForHist,
-            date: histDateAi,
-            friendsCount: aiFriends,
-            letterText: fullLetter
-        });
-    } catch (error) {
-        fullDraftArea.value = "Error connecting to AI. Please check your API key or internet connection.";
-        console.error(error);
+    if (isMulti) {
+        endGroup.classList.remove('hidden');
+        dateLabel.innerText = "FROM DATE";
+    } else {
+        endGroup.classList.add('hidden');
+        dateLabel.innerText = "DATE OF THE EVENT";
     }
 }
 
-// Compiles the edited text into the final PDF format
-// Compiles the edited text into the final PDF format
-function downloadPDF() {
-    const doc = new jsPDF();
-    const margin = 20;
-    
-    // Get the event name for the filename
-    const eventInput = document.getElementById('stdEvent').value.trim();
-    // If event name is empty (like in AI mode), fallback to "Leave_Letter"
-    const fileName = eventInput ? `${eventInput} DL.pdf` : "Leave_Letter.pdf";
+// --- HISTORY & OTHER UTILS ---
 
-    const fullText = document.getElementById('fullDraftLetter').value;
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(12);
-    
-    const splitText = doc.splitTextToSize(fullText, 170);
-    doc.text(splitText, margin, 20);
-
-    // Use the dynamic filename here
-    doc.save(fileName);
-}
-
-// Dynamically generates input fields based on the number selected
-// Function for Standard View Friends (Instant Update with 15 Limit)
-function generateFriendFields() {
-    let numInput = document.getElementById('numFriends').value;
-    
-    // LIMITER: If user types more than 15, force it back to 15
-    if (parseInt(numInput) > 15) {
-        document.getElementById('numFriends').value = 15;
-        numInput = 15;
-    }
-
-    const num = numInput === "" ? 0 : parseInt(numInput);
-    const container = document.getElementById('friendsContainer');
-    container.innerHTML = ''; 
-
-    for (let i = 1; i <= num; i++) {
-        const div = document.createElement('div');
-        div.className = 'form-group';
-        div.innerHTML = `
-            <label style="color: #ffffff; font-size: 0.8rem; font-weight: 900; text-transform: uppercase;">Friend ${i} Name</label>
-            <input type="text" class="friend-name" placeholder="E.G., JOHN DOE">
-        `;
-        container.appendChild(div);
-    }
-}
-
-// Function for AI View Friends (Instant Update with 15 Limit)
-function generateFriendFieldsAI() {
-    let numInput = document.getElementById('numFriendsAI').value;
-
-    // LIMITER: If user types more than 15, force it back to 15
-    if (parseInt(numInput) > 15) {
-        document.getElementById('numFriendsAI').value = 15;
-        numInput = 15;
-    }
-
-    const num = numInput === "" ? 0 : parseInt(numInput);
-    const container = document.getElementById('friendsContainerAI');
-    container.innerHTML = ''; 
-
-    for (let i = 1; i <= num; i++) {
-        const div = document.createElement('div');
-        div.className = 'form-group';
-        div.innerHTML = `
-            <label style="color: #ffffff; font-size: 0.8rem; font-weight: 900; text-transform: uppercase;">Friend ${i} Name</label>
-            <input type="text" class="friend-name-ai" placeholder="E.G., JOHN DOE">
-        `;
-        container.appendChild(div);
-    }
-}
-
-// Auto-fill on page load
-window.addEventListener('DOMContentLoaded', () => {
-    const savedData = localStorage.getItem('savedUser');
-    if (savedData) {
-        const data = JSON.parse(savedData);
-        
-        // Fill the Standard View fields
-        if(document.getElementById('stdName')) document.getElementById('stdName').value = data.name || "";
-        if(document.getElementById('stdDepartment')) document.getElementById('stdDepartment').value = data.dept || "";
-        if(document.getElementById('stdCollege')) document.getElementById('stdCollege').value = data.college || "";
-        
-        // Also fill the AI View fields (optional but helpful)
-        if(document.getElementById('aiName')) document.getElementById('aiName').value = data.name || "";
-        if(document.getElementById('aiDept')) document.getElementById('aiDept').value = data.dept || "";
-        if(document.getElementById('aiCollege')) document.getElementById('aiCollege').value = data.college || "";
-        
-        // Keep the checkbox checked
-        if(document.getElementById('rememberMe')) document.getElementById('rememberMe').checked = true;
-    }
-});
-
-// --- NEW HISTORY LOGIC ---
-
-// Helper function to save a draft to local storage
 function saveToHistory(entryData) {
     let history = JSON.parse(localStorage.getItem('letterHistory') || '[]');
-    history.unshift(entryData); // Add to the beginning of the array
-    if (history.length > 5) {
-        history = history.slice(0, 5); // Enforce the 5-item limit
-    }
+    history.unshift(entryData);
+    if (history.length > 5) history = history.slice(0, 5);
     localStorage.setItem('letterHistory', JSON.stringify(history));
 }
 
-// Loads the history buttons into the History View
 function loadHistory() {
     const history = JSON.parse(localStorage.getItem('letterHistory') || '[]');
     const container = document.getElementById('historyListContainer');
     container.innerHTML = ''; 
 
     if (history.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #888; margin-top: 2rem;">No history found. Draft a letter first!</p>';
+        container.innerHTML = '<p style="text-align: center; color: #888; margin-top: 2rem;">No history found.</p>';
         return;
     }
 
     history.forEach((item, index) => {
         const div = document.createElement('div');
-        // Reusing option-card for that clicky feel
         div.className = 'option-card'; 
         div.style.textAlign = 'left';
-        div.style.display = 'flex';
-        div.style.flexDirection = 'column';
-        div.style.gap = '5px';
         div.onclick = () => openHistoryDetail(index);
-        
         div.innerHTML = `
             <div style="font-size: 1.1rem; font-weight: 900; text-transform: uppercase; color: #ffffff;">${item.eventName}</div>
-            <div style="font-size: 0.8rem; color: #aaa; font-weight: normal; text-transform: none;">
-                Date: ${item.date} &nbsp;|&nbsp; Friends: ${item.friendsCount}
-            </div>
+            <div style="font-size: 0.8rem; color: #aaa;">${item.date} | Friends: ${item.friendsCount}</div>
         `;
         container.appendChild(div);
     });
 }
 
-// Opens the detail page for a specific history item
 function openHistoryDetail(index) {
     const history = JSON.parse(localStorage.getItem('letterHistory') || '[]');
     const item = history[index];
-    
     if (item) {
         document.getElementById('historyFullDraftLetter').value = item.letterText;
-        // Stash the event name so the PDF download names the file correctly
         document.getElementById('historyFullDraftLetter').setAttribute('data-event', item.eventName); 
         delayedNavigate('historyDetailView');
     }
 }
 
-// Download PDF function specific to the History View
-function downloadHistoryPDF() {
+function clearHistory() {
+    if (confirm("Clear all draft history?")) {
+        localStorage.removeItem('letterHistory');
+        loadHistory();
+    }
+}
+
+function generateFriendFields() {
+    let numInput = document.getElementById('numFriends').value;
+    if (parseInt(numInput) > 15) {
+        document.getElementById('numFriends').value = 15;
+        numInput = 15;
+    }
+    const num = numInput === "" ? 0 : parseInt(numInput);
+    const container = document.getElementById('friendsContainer');
+    container.innerHTML = ''; 
+    for (let i = 1; i <= num; i++) {
+        const div = document.createElement('div');
+        div.className = 'form-group';
+        div.innerHTML = `<label>Friend ${i} Name</label><input type="text" class="friend-name" placeholder="E.G., JOHN DOE">`;
+        container.appendChild(div);
+    }
+}
+
+function downloadPDF() {
     const doc = new jsPDF();
-    const margin = 20;
-    
-    const textArea = document.getElementById('historyFullDraftLetter');
-    const fullText = textArea.value;
-    const eventInput = textArea.getAttribute('data-event') || "Leave_Letter";
-    const fileName = `${eventInput} DL.pdf`;
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(12);
-    
+    const eventInput = document.getElementById('stdEvent').value.trim();
+    const fileName = eventInput ? `${eventInput} DL.pdf` : "Leave_Letter.pdf";
+    const fullText = document.getElementById('fullDraftLetter').value;
+    doc.setFont("courier", "normal");
+    doc.setFontSize(11);
     const splitText = doc.splitTextToSize(fullText, 170);
-    doc.text(splitText, margin, 20);
-
+    doc.text(splitText, 20, 20);
     doc.save(fileName);
 }
 
-// Clears all saved history entries from local storage
-function clearHistory() {
-    const history = JSON.parse(localStorage.getItem('letterHistory') || '[]');
-    
-    if (history.length === 0) {
-        alert("Your history is already empty.");
-        return;
-    }
-
-    // Ask for confirmation before deleting
-    if (confirm("Are you sure you want to clear your draft history? This cannot be undone.")) {
-        localStorage.removeItem('letterHistory');
-        loadHistory(); // Instantly refreshes the view to show the empty state
-    }
+function downloadHistoryPDF() {
+    const doc = new jsPDF();
+    const textArea = document.getElementById('historyFullDraftLetter');
+    const eventName = textArea.getAttribute('data-event') || "Leave_Letter";
+    doc.setFont("courier", "normal");
+    doc.setFontSize(11);
+    const splitText = doc.splitTextToSize(textArea.value, 170);
+    doc.text(splitText, 20, 20);
+    doc.save(`${eventName} DL.pdf`);
 }
+
+window.addEventListener('DOMContentLoaded', () => {
+    const savedData = localStorage.getItem('savedUser');
+    if (savedData) {
+        const data = JSON.parse(savedData);
+        if(document.getElementById('stdName')) document.getElementById('stdName').value = data.name || "";
+        if(document.getElementById('stdDepartment')) document.getElementById('stdDepartment').value = data.dept || "";
+        if(document.getElementById('stdCollege')) document.getElementById('stdCollege').value = data.college || "";
+        if(document.getElementById('rememberMe')) document.getElementById('rememberMe').checked = true;
+    }
+});

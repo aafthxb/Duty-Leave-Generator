@@ -285,12 +285,24 @@
     <input type="text" id="stdLocation" placeholder="INSTITUTION / CITY">
 </div>
 
+<div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
+    <input type="checkbox" id="isMultiDay" style="width: 18px; height: 18px; cursor: pointer;" onchange="toggleDateRange()">
+    <label style="margin-bottom: 0; cursor: pointer;" for="isMultiDay">Multi-day Event</label>
+</div>
+
 <div class="grid" style="margin-top: 0; margin-bottom: 1.2rem;">
-    
     <div class="form-group" style="margin-bottom: 0;">
-        <label>DATE OF EVENT</label>
+        <label id="dateLabel">DATE OF THE EVENT</label>
         <input type="date" id="stdDateTime">
     </div>
+    <div id="endDateGroup" class="form-group hidden" style="margin-bottom: 0;">
+        <label>TO DATE</label>
+        <input type="date" id="stdEndDateTime">
+    </div>
+</div>
+
+<div class="grid" style="margin-top: 0; margin-bottom: 1.2rem;">
+    
     <div class="form-group" style="margin-bottom: 0;">
         <label>Friends Count (0-15)</label>
         <input type="number" id="numFriends" min="0" max="15" placeholder="0" oninput="generateFriendFields()">
