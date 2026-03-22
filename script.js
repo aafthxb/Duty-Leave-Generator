@@ -327,17 +327,19 @@ async function draftAI() {
     submitBtn.style.pointerEvents = "none";
 
     const promptText = `
-    Write a professional formal letter. 
+    Write a professional formal letter based on the details below.
     FROM: ${fromName}, ${fromAdd1}, ${fromAdd2}
     TO: ${toName}, ${toAdd1}, ${toAdd2}
     DATE: ${dateStr}
     REASON: ${reason}
-    REQUIREMENTS: 
-    1. Output RAW TEXT ONLY. No Markdown (** or #).
-    2. HEADER SPACING: You MUST include exactly ONE EMPTY LINE between the From Address block, the Date and the To Address block.
+
+    STRICT FORMATING REQUIREMENTS: 
+    1. Output RAW TEXT ONLY. Absolutely no Markdown (no asterisks, hashtags, or bolding).
+    2. HEADER SPACING: Include exactly ONE EMPTY LINE between the From Address block and the Date.
     3. TO ADDRESS SPACING: Include exactly ONE EMPTY LINE between the Date and the To Address block.
-    4. SUBJECT LINE: Keep it concise (e.g., "Subject: Request for Medical Leave"). No personal details in the subject.
-    5. SIGN-OFF: Under the sign-off, ONLY output the sender's name (${fromName}) directly on the next line.
+    4. SUBJECT LINE: Keep it short (e.g., "Subject: Request for Medical Leave"). 
+       DO NOT include names, departments, or DATES in the subject line.
+    5. SIGN-OFF: Under the sign-off (e.g., "Sincerely,"), output the sender's name (${fromName}) directly on the next line with no empty space.
 `;
 
     try {
