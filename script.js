@@ -60,9 +60,15 @@ function draftStandard() {
         }
     }
 
-    // 4. Current Date for Header
+    // 4. Current Date for Header & Precise Generation Time
     const now = new Date();
     const todayStr = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
+    
+    // NEW: Capture Time & Date for History View
+    const timestamp = now.toLocaleString('en-GB', { 
+        day: '2-digit', month: '2-digit', year: 'numeric', 
+        hour: '2-digit', minute: '2-digit', hour12: true 
+    }).toUpperCase();
 
     // 5. Friends Logic
     const friendInputs = document.querySelectorAll('.friend-name');
@@ -101,38 +107,20 @@ ${signatureBlock}`;
     // 7. DISPLAY RESULT BELOW (Scrolling behavior)
     const editingBay = document.getElementById('editingBay');
     document.getElementById('fullDraftLetter').value = fullLetter;
-    
-    // Reveal the editing bay WITHOUT hiding the form
     editingBay.classList.remove('hidden');
-    
-    // Smooth scroll down to the result
     editingBay.scrollIntoView({ behavior: 'smooth' });
 
-    // 8. Save to History
+    // 8. Save to History (Including the generation timestamp)
     saveToHistory({
         eventName: eventName !== "[Event Name]" ? eventName : "Standard Request",
         date: histDateDisplay,
         friendsCount: friendsArray.length,
-        letterText: fullLetter
+        letterText: fullLetter,
+        generatedAt: timestamp
     });
 }
 
-// Toggle logic for the multi-day UI
-function toggleDateRange() {
-    const isMulti = document.getElementById('isMultiDay').checked;
-    const endGroup = document.getElementById('endDateGroup');
-    const dateLabel = document.getElementById('dateLabel');
-    
-    if (isMulti) {
-        endGroup.classList.remove('hidden');
-        dateLabel.innerText = "FROM DATE";
-    } else {
-        endGroup.classList.add('hidden');
-        dateLabel.innerText = "DATE OF THE EVENT";
-    }
-}
-
-// --- HISTORY & OTHER UTILS ---
+// --- HISTORY LOGIC ---
 
 function saveToHistory(entryData) {
     let history = JSON.parse(localStorage.getItem('letterHistory') || '[]');
@@ -156,13 +144,20 @@ function loadHistory() {
         div.className = 'option-card'; 
         div.style.textAlign = 'left';
         div.onclick = () => openHistoryDetail(index);
+        
+        // Displaying Event Name, Details, and Generation Time
         div.innerHTML = `
             <div style="font-size: 1.1rem; font-weight: 900; text-transform: uppercase; color: #ffffff;">${item.eventName}</div>
             <div style="font-size: 0.8rem; color: #aaa;">${item.date} | Friends: ${item.friendsCount}</div>
+            <div style="font-size: 0.65rem; color: #666; margin-top: 5px; font-family: monospace;">
+                GENERATED: ${item.generatedAt || 'N/A'}
+            </div>
         `;
         container.appendChild(div);
     });
 }
+
+// ... Rest of the toggleDateRange, generateFriendFields, and PDF functions remain the same ...
 
 function openHistoryDetail(index) {
     const history = JSON.parse(localStorage.getItem('letterHistory') || '[]');
@@ -178,6 +173,20 @@ function clearHistory() {
     if (confirm("Clear all draft history?")) {
         localStorage.removeItem('letterHistory');
         loadHistory();
+    }
+}
+
+function toggleDateRange() {
+    const isMulti = document.getElementById('isMultiDay').checked;
+    const endGroup = document.getElementById('endDateGroup');
+    const dateLabel = document.getElementById('dateLabel');
+    
+    if (isMulti) {
+        endGroup.classList.remove('hidden');
+        dateLabel.innerText = "FROM DATE";
+    } else {
+        endGroup.classList.add('hidden');
+        dateLabel.innerText = "DATE OF THE EVENT";
     }
 }
 
