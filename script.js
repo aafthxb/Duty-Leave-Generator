@@ -161,7 +161,7 @@ function loadHistory() {
     history.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = 'option-card'; 
-        div.style.textAlign = 'left'; // Reverted to left alignment
+        div.style.textAlign = 'left'; // Reverted to original left alignment
         div.onclick = () => openHistoryDetail(index);
         div.innerHTML = `
             <div style="font-size: 1.1rem; font-weight: 900; text-transform: uppercase; color: #ffffff;">${item.eventName}</div>
