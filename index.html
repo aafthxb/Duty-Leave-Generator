@@ -58,15 +58,22 @@
             transform: translateY(0);
         }
 
-        @media (max-width: 480px) {
-            .card { 
-                padding: 1.2rem; 
-                transform: translateY(-5vh);
-                
-            }
-            h2 { font-size: 1.3rem; }
-            .grid { gap: 0.8rem; }
-        }
+       @media (max-width: 480px) {
+    .card { 
+        padding: 1.2rem; 
+        /* General lift for all views */
+        transform: translateY(-5vh); 
+    }
+
+    /* Specific lift for History and Detail views to bring them "to the top" */
+    .card:has(#historyView:not(.hidden)),
+    .card:has(#historyDetailView:not(.hidden)) {
+        transform: translateY(-12vh) !important;
+    }
+
+    h2 { font-size: 1.3rem; }
+    .grid { gap: 0.8rem; }
+}
         
         .grid { 
             display: grid; 
