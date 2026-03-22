@@ -113,7 +113,14 @@ ${signatureBlock}`;
         eventName: eventName !== "[Event Name]" ? eventName : "Standard Request",
         date: histDateDisplay,
         friendsCount: friendsArray.length,
-        letterText: fullLetter
+        letterText: fullLetter,
+        generatedAt: new Date().toLocaleString([], { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric', 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        })
     });
 }
 
@@ -159,6 +166,7 @@ function loadHistory() {
         div.innerHTML = `
             <div style="font-size: 1.1rem; font-weight: 900; text-transform: uppercase; color: #ffffff;">${item.eventName}</div>
             <div style="font-size: 0.8rem; color: #aaa;">${item.date} | Friends: ${item.friendsCount}</div>
+            <div style="font-size: 0.7rem; color: #666; margin-top: 5px; text-transform: uppercase;">Generated: ${item.generatedAt || 'N/A'}</div>
         `;
         container.appendChild(div);
     });
