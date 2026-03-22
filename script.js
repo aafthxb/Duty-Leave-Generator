@@ -171,6 +171,9 @@ function openHistoryDetail(index) {
         document.getElementById('historyFullDraftLetter').value = item.letterText;
         document.getElementById('historyFullDraftLetter').setAttribute('data-event', item.eventName); 
         delayedNavigate('historyDetailView');
+        
+        // Nudge the scroll to the top so the 'bit higher' position is visible
+        window.scrollTo({ top: 0, behavior: 'instant' });
     }
 }
 
